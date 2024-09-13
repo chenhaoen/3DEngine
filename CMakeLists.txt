@@ -3,6 +3,12 @@ cmake_minimum_required(VERSION 3.28)
 project(3DEngine CXX)
 set(CMAKE_CXX_STANDARD 20)
 
-find_package(Vulkan)
+set(INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/include)
+set(SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
+
+include_directories(${INCLUDE_DIR})
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/examples)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src/Base)
