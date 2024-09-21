@@ -3,7 +3,7 @@ project(Base)
 set(BASE_INCLUDE_DIR ${INCLUDE_DIR}/Base)
 set(BASE_SRC_DIR ${SRC_DIR}/Base)
 
-find_package(Vulkan)
+
 find_package(glfw3)
 
 file(GLOB ALL_SOURCE "${BASE_SRC_DIR}/*.cpp")

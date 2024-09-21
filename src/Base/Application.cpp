@@ -6,6 +6,7 @@
 #include "Base/Instance.h"
 #include "Base/DebugUtilsMessenger.h"
 #include "Base/LogicalDevice.h"
+#include "Base/PhysicalDevice.h"
 #include "Base/Surface.h"
 #include "Base/SwapChain.h"
 #include "Base/Node.h"

@@ -17,11 +17,6 @@ PhysicalDevice::PhysicalDevice(VkPhysicalDevice vkPhysicalDevice,
 	 
 	if (Application::instance()->debug())
 	{
-		//Vendor: NVIDIA Corporation
-		//Renderer : NVIDIA GeForce RTX 3080 Ti / PCIe / SSE2
-		//Version : 4.6.0 NVIDIA 560.81
-		//Context Version : 4.6
-
 		std::cout << "Device Name: " << m_deviceProperties.deviceName << std::endl;
 
 		uint32_t extensionCount;

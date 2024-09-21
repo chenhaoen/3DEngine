@@ -13,8 +13,8 @@ Pipeline::Pipeline(
     RenderPass* renderPass)
     :m_device(device)
 {
-    auto vertShaderCode = readFile("E:/code/3DEngine/build/bin/Debug/shaders/vert.spv");
-    auto fragShaderCode = readFile("E:/code/3DEngine/build/bin/Debug/shaders/frag.spv");
+    auto vertShaderCode = readFile("shaders/vert.spv");
+    auto fragShaderCode = readFile("shaders/frag.spv");
 
     VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
