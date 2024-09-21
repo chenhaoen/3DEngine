@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <string.h>
 
 #include "Base/Node.h"
 #include "Base/Pipeline.h"

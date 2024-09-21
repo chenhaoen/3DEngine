@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <stdexcept>
+#include <limits>
 
 #include "Base/SwapChain.h"
 #include "Base/PhysicalDevice.h"
