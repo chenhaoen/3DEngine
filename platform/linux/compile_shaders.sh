@@ -1,2 +1,0 @@
-/home/che/Downloads/install/bin/glslc ../../examples/triangle/shaders/shader.vert -o ../../examples/triangle/shaders/vert.spv
-/home/che/Downloads/install/bin/glslc ../../examples/triangle/shaders/shader.frag -o ../../examples/triangle/shaders/frag.spv
