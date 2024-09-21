@@ -16,6 +16,7 @@ class Node;
 class Event;
 class RenderPass;
 class Pipeline;
+class DescriptorSetLayout;
 
 class BASE_API Application
 {
@@ -47,6 +48,7 @@ private:
 	LogicalDevice* m_logicalDevice;
 	RenderPass* m_renderPass;
 	Pipeline* m_pipeline;
+	DescriptorSetLayout* m_descriptorSetLayout;
 
 	Node* m_sceneNode;
 

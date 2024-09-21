@@ -1,2 +1,4 @@
 build
-examples/triangle/shaders
+examples/triangle/shaders/vert.spv
+examples/triangle/shaders/frag.spv
+.vscode

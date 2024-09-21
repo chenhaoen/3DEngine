@@ -13,6 +13,7 @@
 #include "Base/Event.h"
 #include "Base/RenderPass.h"
 #include "Base/Pipeline.h"
+#include "Base/DescriptorSetLayout.h"
 
 Application* Application::g_instance = nullptr;
 
@@ -62,9 +63,10 @@ Application::Application(
 	m_swapChain = new SwapChain(m_logicalDevice, m_physicalDevice, m_surface, m_mainWindow);
 
 	m_renderPass = new RenderPass(m_logicalDevice, m_swapChain);
-	m_pipeline = new Pipeline(m_logicalDevice, m_swapChain, m_renderPass);
+	m_descriptorSetLayout = new DescriptorSetLayout(m_logicalDevice);
+	m_pipeline = new Pipeline(m_logicalDevice, m_swapChain, m_renderPass, m_descriptorSetLayout);
 
-	m_sceneNode = new Node(m_logicalDevice,m_swapChain);
+	m_sceneNode = new Node(m_logicalDevice,m_swapChain, m_descriptorSetLayout);
 
 	m_swapChain->setRenderPass(m_renderPass);
 	m_swapChain->createFrameBuffers();
@@ -73,6 +75,7 @@ Application::Application(
 Application::~Application()
 {
 	delete m_sceneNode;
+	delete m_descriptorSetLayout;
 	delete m_pipeline;
 	delete m_renderPass;
 	delete m_swapChain;
