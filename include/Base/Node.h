@@ -47,6 +47,8 @@ public:
 	void drawFrame(RenderPass *renderPass, Pipeline *pipeline);
 
 	void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex, RenderPass *renderPass, Pipeline *pipeline);
+
+	VkDescriptorPool getVkDescriptorPool() const;
 private:
 	void createVertexBuffer();
 

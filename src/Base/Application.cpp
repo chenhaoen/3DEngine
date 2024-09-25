@@ -1,5 +1,7 @@
 #include <stdexcept>
 #include <iostream>
+#include <algorithm>
+#include <memory>
 
 #include "Base/Application.h"
 #include "Base/Window.h"
@@ -12,17 +14,18 @@
 #include "Base/Node.h"
 #include "Base/Event.h"
 #include "Base/RenderPass.h"
-#include "Base/Pipeline.h"
-#include "Base/DescriptorSetLayout.h"
+#include "Base/Layer.h"
+#include "Base/FrameManager.h"
+#include "Base/OverlayLayer.h"
 
-Application* Application::g_instance = nullptr;
+Application *Application::g_instance = nullptr;
 
 Application::Application(
-	const std::string_view& name,
+	const std::string_view &name,
 	const bool debug)
-	:m_name(name)
-	, m_debug(debug)
-	, m_debugUtilsMessenger(nullptr)
+	: m_name(name),
+	  m_debug(debug),
+	  m_debugUtilsMessenger(nullptr)
 {
 	if (g_instance != nullptr)
 	{
@@ -33,7 +36,7 @@ Application::Application(
 
 	m_mainWindow = new Window(1600, 1200, m_name);
 
-	const std::vector<const char*>& windowInstanceExtensions = Window::GetRequiredInstanceExtensions();
+	const std::vector<const char *> &windowInstanceExtensions = Window::GetRequiredInstanceExtensions();
 	m_instanceExtensions.insert(m_instanceExtensions.end(), windowInstanceExtensions.begin(), windowInstanceExtensions.end());
 	m_deviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
@@ -45,7 +48,7 @@ Application::Application(
 
 	m_instance = new Instance();
 
-	m_surface = new Surface(m_instance,m_mainWindow);
+	m_surface = new Surface(m_instance, m_mainWindow);
 
 	if (m_debug)
 	{
@@ -63,20 +66,20 @@ Application::Application(
 	m_swapChain = new SwapChain(m_logicalDevice, m_physicalDevice, m_surface, m_mainWindow);
 
 	m_renderPass = new RenderPass(m_logicalDevice, m_swapChain);
-	m_descriptorSetLayout = new DescriptorSetLayout(m_logicalDevice);
-	m_pipeline = new Pipeline(m_logicalDevice, m_swapChain, m_renderPass, m_descriptorSetLayout);
-
-	m_sceneNode = new Node(m_logicalDevice,m_swapChain, m_descriptorSetLayout);
 
 	m_swapChain->setRenderPass(m_renderPass);
 	m_swapChain->createFrameBuffers();
+
+	m_frameManager = new FrameManager(m_logicalDevice, m_swapChain,m_renderPass);
+
+	m_layers.push_back(new OverlayLayer(m_instance,m_logicalDevice,m_mainWindow, m_swapChain,m_renderPass));
 }
 
 Application::~Application()
 {
-	delete m_sceneNode;
-	delete m_descriptorSetLayout;
-	delete m_pipeline;
+	std::for_each(m_layers.begin(), m_layers.end(), std::default_delete<Layer>());
+
+	delete m_frameManager;
 	delete m_renderPass;
 	delete m_swapChain;
 	delete m_logicalDevice;
@@ -89,9 +92,11 @@ Application::~Application()
 
 int Application::exec()
 {
-	while (!m_mainWindow->shouldClose()) {
+	while (!m_mainWindow->shouldClose())
+	{
 		m_mainWindow->pollEvents();
-		m_sceneNode->drawFrame(m_renderPass,m_pipeline);
+
+		m_frameManager->frame(m_layers);
 	}
 
 	m_logicalDevice->Wait();
@@ -99,47 +104,47 @@ int Application::exec()
 	return 0;
 }
 
-bool Application::debug() const 
+bool Application::debug() const
 {
 	return m_debug;
 }
 
-const std::vector<const char*>& Application::getInstanceExtensions() const
+const std::vector<const char *> &Application::getInstanceExtensions() const
 {
 	return m_instanceExtensions;
 }
 
-const std::vector<const char*>& Application::getDeviceExtensions() const
+const std::vector<const char *> &Application::getDeviceExtensions() const
 {
 	return m_deviceExtensions;
 }
 
-const std::vector<const char*>& Application::getInstanceLayers() const
+const std::vector<const char *> &Application::getInstanceLayers() const
 {
 	return m_instanceLayers;
 }
 
-const std::string_view& Application::getName() const
+const std::string_view &Application::getName() const
 {
 	return m_name;
 }
 
-void Application::onEvent(Event& event)
+void Application::onEvent(Event &event)
 {
 
-	//std::cout << "Height :" << event.windowHeight << ", width :" << event.windowWidth << std::endl;
+	// std::cout << "Height :" << event.windowHeight << ", width :" << event.windowWidth << std::endl;
 
 	if (event.windowHeight == 0 && event.windowWidth == 0)
 	{
 		int width = 0, height = 0;
-		while (width == 0 || height == 0) {
-			m_mainWindow->getWindowSize(width,height);
+		while (width == 0 || height == 0)
+		{
+			m_mainWindow->getWindowSize(width, height);
 			m_mainWindow->waitEvents();
 		}
 
 		m_logicalDevice->Wait();
 		return;
-
 	}
 
 	m_logicalDevice->Wait();
@@ -149,7 +154,7 @@ void Application::onEvent(Event& event)
 	m_swapChain->createFrameBuffers();
 }
 
-Application* Application::instance()
+Application *Application::instance()
 {
 	return g_instance;
 }

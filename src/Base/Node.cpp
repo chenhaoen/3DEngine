@@ -68,7 +68,7 @@ Node::Node(LogicalDevice *device, SwapChain *swapChain, DescriptorSetLayout *des
 	createIndexBuffer();
 	createUniformBuffers();
 	createDescriptorPool();
-	createDescriptorSets();
+	//createDescriptorSets();
 }
 
 Node::~Node()
@@ -177,7 +177,7 @@ void Node::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageInde
 
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->getVkPipeline());
 
-	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->getVkPipelineLayout(), 0, 1, &m_descriptorSets[m_currentFrame], 0, nullptr);
+	//(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->getVkPipelineLayout(), 0, 1, &m_descriptorSets[m_currentFrame], 0, nullptr);
 
 	VkBuffer vertexBuffers[] = {m_vertexBuffer};
 	VkDeviceSize offsets[] = {0};
@@ -201,12 +201,19 @@ void Node::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageInde
 
 	vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 
+	
+
 	vkCmdEndRenderPass(commandBuffer);
 
 	if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to record command buffer!");
 	}
+}
+
+VkDescriptorPool Node::getVkDescriptorPool() const
+{
+	return m_descriptorPool;
 }
 
 void Node::createVertexBuffer()
@@ -380,14 +387,15 @@ void Node::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
 
 void Node::createDescriptorPool()
 {
-	VkDescriptorPoolSize poolSize{};
-	poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	poolSize.descriptorCount = static_cast<uint32_t>(Application::maxFrameCount());
+	VkDescriptorPoolSize pool_sizes[] =
+		{
+			{VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1}};
+
 
 	VkDescriptorPoolCreateInfo poolInfo{};
 	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 	poolInfo.poolSizeCount = 1;
-	poolInfo.pPoolSizes = &poolSize;
+	poolInfo.pPoolSizes = pool_sizes;
 	poolInfo.maxSets = static_cast<uint32_t>(Application::maxFrameCount());
 
 	if (vkCreateDescriptorPool(m_device->getVkDevice(), &poolInfo, nullptr, &m_descriptorPool) != VK_SUCCESS)

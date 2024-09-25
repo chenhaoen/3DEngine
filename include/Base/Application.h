@@ -2,6 +2,7 @@
 
 #include <string_view>
 #include <vector>
+#include <list>
 
 #include "Base/Exports.h"
 
@@ -12,11 +13,10 @@ class PhysicalDevice;
 class LogicalDevice;
 class Surface;
 class SwapChain;
-class Node;
 class Event;
+class Layer;
+class FrameManager;
 class RenderPass;
-class Pipeline;
-class DescriptorSetLayout;
 
 class BASE_API Application
 {
@@ -46,11 +46,10 @@ private:
 	DebugUtilsMessenger* m_debugUtilsMessenger;
 	PhysicalDevice* m_physicalDevice;
 	LogicalDevice* m_logicalDevice;
-	RenderPass* m_renderPass;
-	Pipeline* m_pipeline;
-	DescriptorSetLayout* m_descriptorSetLayout;
+    RenderPass* m_renderPass;
+	FrameManager* m_frameManager;
 
-	Node* m_sceneNode;
+	std::list<Layer*> m_layers;
 
 	std::string_view m_name;
 

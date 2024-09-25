@@ -48,10 +48,10 @@ Instance::Instance()
 
         if (Application::instance()->debug())
         {
-            std::cout << "available instance extensions:\n";
+            //std::cout << "available instance extensions:\n";
 
             for (const auto& extension : m_extensionProperties) {
-                std::cout << '\t' << extension.extensionName << '\n';
+                //std::cout << '\t' << extension.extensionName << '\n';
             }
         }
     }
@@ -65,10 +65,10 @@ Instance::Instance()
 
         if (Application::instance()->debug())
         {
-            std::cout << "available instance layers:\n";
+           // std::cout << "available instance layers:\n";
 
             for (const auto& layer : m_availableLayers) {
-                std::cout << '\t' << layer.layerName << '\n';
+                //std::cout << '\t' << layer.layerName << '\n';
             }
         }
     }

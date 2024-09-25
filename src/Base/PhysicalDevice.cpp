@@ -25,10 +25,10 @@ PhysicalDevice::PhysicalDevice(VkPhysicalDevice vkPhysicalDevice,
 		std::vector<VkExtensionProperties> availableExtensions(extensionCount);
 		vkEnumerateDeviceExtensionProperties(m_vkPhysicalDevice, nullptr, &extensionCount, availableExtensions.data());
 
-		std::cout << "available device extensions:\n";
+		//std::cout << "available device extensions:\n";
 
 		for (const auto& extension : availableExtensions) {
-			std::cout << '\t' << extension.extensionName << '\n';
+			//std::cout << '\t' << extension.extensionName << '\n';
 		}
 	}
 

@@ -22,6 +22,8 @@ public:
 	void getFrameBufferSize(int& width, int& height);
 	void getWindowSize(int& width, int& height);
 
+	void* naviteWindow() const;
+
 	static std::vector<const char*> GetRequiredInstanceExtensions();
 private:
 	void* m_pWindow;
