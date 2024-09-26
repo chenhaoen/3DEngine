@@ -2,21 +2,20 @@
 
 #include <cstdint>
 #include <vector>
-#include <list>
 
 class Frame;
-class Layer;
 class LogicalDevice;
 class CommandPool;
 class SwapChain;
 class RenderPass;
+class LayerManager;
 class FrameManager
 {
 public:
     FrameManager(LogicalDevice* device, SwapChain* swapChain, RenderPass* renderPass);
     ~FrameManager();
 
-    void frame(const std::list<Layer*>& layers);
+    void frame(LayerManager* layerManager);
 private:
     LogicalDevice* m_device;
     CommandPool* m_commandPool;

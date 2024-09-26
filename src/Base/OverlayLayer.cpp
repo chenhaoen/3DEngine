@@ -10,8 +10,8 @@
 #include "Base/Instance.h"
 #include "Base/RenderPass.h"
 
-OverlayLayer::OverlayLayer(Instance *instance, LogicalDevice *device, Window *window, SwapChain *swapChain, RenderPass* renderPass)
-	: Layer(instance, device, window, swapChain,renderPass)
+OverlayLayer::OverlayLayer(Instance *instance, LogicalDevice *device, Window *window, SwapChain *swapChain, RenderPass *renderPass)
+	: Layer(instance, device, window, swapChain, renderPass)
 {
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -60,11 +60,12 @@ OverlayLayer::~OverlayLayer()
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
 
-	vkDestroyDescriptorPool(m_device->getVkDevice(),m_descriptorPool, nullptr);
+	vkDestroyDescriptorPool(m_device->getVkDevice(), m_descriptorPool, nullptr);
 }
 
 // Our state
 bool show_demo_window = true;
+bool show = true;
 bool show_another_window = false;
 ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -77,7 +78,10 @@ void OverlayLayer::recordCommandBuffer(Frame *frame)
 
 	// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
 	if (show_demo_window)
+	{
+
 		ImGui::ShowDemoWindow(&show_demo_window);
+	}
 
 	// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
 	{
@@ -85,6 +89,35 @@ void OverlayLayer::recordCommandBuffer(Frame *frame)
 		static int counter = 0;
 
 		ImGui::Begin("Hello, world!"); // Create a window called "Hello, world!" and append into it.
+
+		if (ImGui::BeginMainMenuBar())
+		{
+			if (ImGui::BeginMenu("File"))
+			{
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Edit"))
+			{
+				if (ImGui::MenuItem("Undo", "CTRL+Z"))
+				{
+				}
+				if (ImGui::MenuItem("Redo", "CTRL+Y", false, false))
+				{
+				} // Disabled item
+				ImGui::Separator();
+				if (ImGui::MenuItem("Cut", "CTRL+X"))
+				{
+				}
+				if (ImGui::MenuItem("Copy", "CTRL+C"))
+				{
+				}
+				if (ImGui::MenuItem("Paste", "CTRL+V"))
+				{
+				}
+				ImGui::EndMenu();
+			}
+			ImGui::EndMainMenuBar();
+		}
 
 		ImGui::Text("This is some useful text.");		   // Display some text (you can use a format strings too)
 		ImGui::Checkbox("Demo Window", &show_demo_window); // Edit bools storing our window open/close state
@@ -118,7 +151,7 @@ void OverlayLayer::recordCommandBuffer(Frame *frame)
 	const bool is_minimized = (draw_data->DisplaySize.x <= 0.0f || draw_data->DisplaySize.y <= 0.0f);
 
 	VkClearValue clearValue = frame->getClearVaule();
-	clearValue.color = {clear_color.x, clear_color.y, clear_color.z, clear_color.w };
+	clearValue.color = {clear_color.x, clear_color.y, clear_color.z, clear_color.w};
 	frame->setClearValue(clearValue);
 
 	ImGui_ImplVulkan_RenderDrawData(draw_data, frame->getCommandBuffer());

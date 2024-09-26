@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vulkan/vulkan.h>
+
 #include "Base/Layer.h"
 
 class OverlayLayer : public Layer

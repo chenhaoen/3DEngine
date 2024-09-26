@@ -16,6 +16,7 @@
 #include "Base/RenderPass.h"
 #include "Base/Layer.h"
 #include "Base/FrameManager.h"
+#include "Base/LayerManager.h"
 #include "Base/OverlayLayer.h"
 
 Application *Application::g_instance = nullptr;
@@ -71,14 +72,12 @@ Application::Application(
 	m_swapChain->createFrameBuffers();
 
 	m_frameManager = new FrameManager(m_logicalDevice, m_swapChain,m_renderPass);
-
-	m_layers.push_back(new OverlayLayer(m_instance,m_logicalDevice,m_mainWindow, m_swapChain,m_renderPass));
+	m_layerManager = new LayerManager(m_instance,m_logicalDevice,m_mainWindow, m_swapChain,m_renderPass);
 }
 
 Application::~Application()
 {
-	std::for_each(m_layers.begin(), m_layers.end(), std::default_delete<Layer>());
-
+	delete m_layerManager;
 	delete m_frameManager;
 	delete m_renderPass;
 	delete m_swapChain;
@@ -96,7 +95,7 @@ int Application::exec()
 	{
 		m_mainWindow->pollEvents();
 
-		m_frameManager->frame(m_layers);
+		m_frameManager->frame(m_layerManager);
 	}
 
 	m_logicalDevice->Wait();

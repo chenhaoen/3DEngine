@@ -38,7 +38,7 @@ const std::vector<Vertex> vertices = {
 const std::vector<uint16_t> indices = {
 	0, 1, 2, 2, 3, 0};
 
-class Node
+class BASE_API Node
 {
 public:
 	Node(LogicalDevice *device, SwapChain *swapChain, DescriptorSetLayout* descriptorSetLayout);
