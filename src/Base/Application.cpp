@@ -11,13 +11,10 @@
 #include "Base/PhysicalDevice.h"
 #include "Base/Surface.h"
 #include "Base/SwapChain.h"
-#include "Base/Node.h"
 #include "Base/Event.h"
 #include "Base/RenderPass.h"
-#include "Base/Layer.h"
 #include "Base/FrameManager.h"
 #include "Base/LayerManager.h"
-#include "Base/OverlayLayer.h"
 
 Application *Application::g_instance = nullptr;
 

@@ -5,8 +5,8 @@
 #include "Base/LogicalDevice.h"
 #include "Base/SwapChain.h"
 #include "Base/RenderPass.h"
-#include "Base/Node.h"
 #include "Base/DescriptorSetLayout.h"
+#include "Nodes/Node.h"
 
 Pipeline::Pipeline(
     LogicalDevice *device,

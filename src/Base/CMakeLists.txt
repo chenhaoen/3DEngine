@@ -2,19 +2,24 @@ project(Base)
 
 set(BASE_INCLUDE_DIR ${INCLUDE_DIR}/Base)
 set(BASE_SRC_DIR ${SRC_DIR}/Base)
+set(NODES_INCLUDE_DIR ${INCLUDE_DIR}/Nodes)
+set(NODES_SRC_DIR ${SRC_DIR}/Nodes)
 
 find_package(glfw3)
 
-file(GLOB ALL_SOURCES "${BASE_SRC_DIR}/*.cpp")
-file(GLOB ALL_HEADERS "${BASE_INCLUDE_DIR}/*.h")
+file(GLOB BASE_SOURCES "${BASE_SRC_DIR}/*.cpp")
+file(GLOB BASE_HEADERS "${BASE_INCLUDE_DIR}/*.h")
+file(GLOB NODES_SOURCES "${NODES_SRC_DIR}/*.cpp")
+file(GLOB NODES_HEADERS "${NODES_INCLUDE_DIR}/*.h")
 file(GLOB IMGUI_HEADERS "${3DEngine_SOURCE_DIR}/3rd/imgui/*.h")
 file(GLOB IMGUI_SOURCES "${3DEngine_SOURCE_DIR}/3rd/imgui/*.cpp")
+
+set(ALL_HEADERS ${BASE_HEADERS} ${NODES_HEADERS} ${IMGUI_HEADERS})
+set(ALL_SOURCES ${BASE_SOURCES} ${NODES_SOURCES} ${IMGUI_SOURCES})
 
 add_library(${PROJECT_NAME} SHARED 
 ${ALL_HEADERS}
 ${ALL_SOURCES}
-${IMGUI_HEADERS}
-${IMGUI_SOURCES}
 ${3DEngine_SOURCE_DIR}/3rd/imgui/backends/imgui_impl_vulkan.h
 ${3DEngine_SOURCE_DIR}/3rd/imgui/backends/imgui_impl_vulkan.cpp
 ${3DEngine_SOURCE_DIR}/3rd/imgui/backends/imgui_impl_glfw.h

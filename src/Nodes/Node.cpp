@@ -5,7 +5,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Base/Node.h"
+#include "Nodes/Node.h"
+
 #include "Base/Pipeline.h"
 #include "Base/RenderPass.h"
 #include "Base/LogicalDevice.h"
