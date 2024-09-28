@@ -4,10 +4,10 @@
 #include "Base/LayerManager.h"
 #include "Base/OverlayLayer.h"
 
-LayerManager::LayerManager(Instance *instance, LogicalDevice *device, Window *window, SwapChain *swapChain, RenderPass *renderPass)
+LayerManager::LayerManager(Window *window)
     : m_overlayLayer(nullptr), m_sceneLayer(nullptr)
 {
-    m_overlayLayer = new OverlayLayer(instance,device,window,swapChain,renderPass);
+    m_overlayLayer = new OverlayLayer(window);
 
     m_layers.push_back(m_overlayLayer);
 }

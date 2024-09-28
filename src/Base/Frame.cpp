@@ -5,9 +5,10 @@
 #include "Base/CommandPool.h"
 #include "Base/SwapChain.h"
 #include "Base/RenderPass.h"
+#include "Base/Context.h"
 
-Frame::Frame(LogicalDevice *device, CommandPool *commandPool, SwapChain *swapChain, RenderPass *renderPass)
-    : m_device(device), m_commandPool(commandPool), m_swapChain(swapChain), m_imageIndex(0), m_renderPass(renderPass)
+Frame::Frame(CommandPool *commandPool)
+    : m_commandPool(commandPool)
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -22,14 +23,14 @@ Frame::Frame(LogicalDevice *device, CommandPool *commandPool, SwapChain *swapCha
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-    if (vkAllocateCommandBuffers(device->getVkDevice(), &allocInfo, &m_commandBuffer) != VK_SUCCESS)
+    if (vkAllocateCommandBuffers(Context::instance()->getDevice()->getVkDevice(), &allocInfo, &m_commandBuffer) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to allocate command buffers!");
     }
 
-    if (vkCreateSemaphore(device->getVkDevice(), &semaphoreInfo, nullptr, &m_imageAvailableSemaphore) != VK_SUCCESS ||
-        vkCreateSemaphore(device->getVkDevice(), &semaphoreInfo, nullptr, &m_renderFinishedSemaphore) != VK_SUCCESS ||
-        vkCreateFence(device->getVkDevice(), &fenceInfo, nullptr, &m_inFlightFence) != VK_SUCCESS)
+    if (vkCreateSemaphore(Context::instance()->getDevice()->getVkDevice(), &semaphoreInfo, nullptr, &m_imageAvailableSemaphore) != VK_SUCCESS ||
+        vkCreateSemaphore(Context::instance()->getDevice()->getVkDevice(), &semaphoreInfo, nullptr, &m_renderFinishedSemaphore) != VK_SUCCESS ||
+        vkCreateFence(Context::instance()->getDevice()->getVkDevice(), &fenceInfo, nullptr, &m_inFlightFence) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create semaphores!");
     }
@@ -39,9 +40,9 @@ Frame::Frame(LogicalDevice *device, CommandPool *commandPool, SwapChain *swapCha
 
 Frame::~Frame()
 {
-    vkDestroySemaphore(m_device->getVkDevice(), m_imageAvailableSemaphore, nullptr);
-    vkDestroySemaphore(m_device->getVkDevice(), m_renderFinishedSemaphore, nullptr);
-    vkDestroyFence(m_device->getVkDevice(), m_inFlightFence, nullptr);
+    vkDestroySemaphore(Context::instance()->getDevice()->getVkDevice(), m_imageAvailableSemaphore, nullptr);
+    vkDestroySemaphore(Context::instance()->getDevice()->getVkDevice(), m_renderFinishedSemaphore, nullptr);
+    vkDestroyFence(Context::instance()->getDevice()->getVkDevice(), m_inFlightFence, nullptr);
 }
 
 VkCommandBuffer Frame::getCommandBuffer() const
@@ -51,11 +52,11 @@ VkCommandBuffer Frame::getCommandBuffer() const
 
 void Frame::begin()
 {
-    vkWaitForFences(m_device->getVkDevice(), 1, &m_inFlightFence, VK_TRUE, UINT64_MAX);
+    vkWaitForFences(Context::instance()->getDevice()->getVkDevice(), 1, &m_inFlightFence, VK_TRUE, UINT64_MAX);
 
-    vkResetFences(m_device->getVkDevice(), 1, &m_inFlightFence);
+    vkResetFences(Context::instance()->getDevice()->getVkDevice(), 1, &m_inFlightFence);
 
-    m_imageIndex = m_swapChain->getNextImageIndex(m_imageAvailableSemaphore);
+    m_imageIndex = Context::instance()->getSwapChain()->getNextImageIndex(m_imageAvailableSemaphore);
 
     vkResetCommandBuffer(m_commandBuffer, 0);
 
@@ -69,12 +70,12 @@ void Frame::begin()
         throw std::runtime_error("failed to begin recording command buffer!");
     }
 
-    VkExtent2D swapChainExtent = m_swapChain->getExtent();
+    VkExtent2D swapChainExtent = Context::instance()->getSwapChain()->getExtent();
 
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = m_renderPass->getVkRenderPass();
-    renderPassInfo.framebuffer = m_swapChain->getFrameBuffer(m_imageIndex);
+    renderPassInfo.renderPass = Context::instance()->getRenderPass()->getVkRenderPass();
+    renderPassInfo.framebuffer = Context::instance()->getSwapChain()->getFrameBuffer(m_imageIndex);
 
     renderPassInfo.clearValueCount = 1;
     renderPassInfo.pClearValues = &m_clearValue;
@@ -109,7 +110,7 @@ void Frame::end()
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
 
-    if (vkQueueSubmit(m_device->getGraphicsQueue(), 1, &submitInfo, m_inFlightFence) != VK_SUCCESS)
+    if (vkQueueSubmit(Context::instance()->getDevice()->getGraphicsQueue(), 1, &submitInfo, m_inFlightFence) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to submit draw command buffer!");
     }
@@ -119,13 +120,13 @@ void Frame::end()
 
     presentInfo.waitSemaphoreCount = 1;
     presentInfo.pWaitSemaphores = signalSemaphores;
-    VkSwapchainKHR swapChains[] = {m_swapChain->getVkSwapChain()};
+    VkSwapchainKHR swapChains[] = {Context::instance()->getSwapChain()->getVkSwapChain()};
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = swapChains;
     presentInfo.pImageIndices = &m_imageIndex;
     presentInfo.pResults = nullptr; // Optional
 
-    vkQueuePresentKHR(m_device->getPresentQueue(), &presentInfo);
+    vkQueuePresentKHR(Context::instance()->getDevice()->getPresentQueue(), &presentInfo);
 }
 
 void Frame::setClearValue(VkClearValue clearValue)

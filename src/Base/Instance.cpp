@@ -5,6 +5,7 @@
 #include "Base/DebugUtilsMessenger.h"
 #include "Base/Application.h"
 #include "Base/PhysicalDevice.h"
+#include "Base/Context.h"
 
 Instance::Instance()
 {
@@ -22,11 +23,11 @@ Instance::Instance()
 
     const auto& windowExtensions = 
 
-    createInfo.enabledExtensionCount = Application::instance()->getInstanceExtensions().size();
-    createInfo.ppEnabledExtensionNames = Application::instance()->getInstanceExtensions().data();
+    createInfo.enabledExtensionCount = Context::instance()->getInstanceExtensions().size();
+    createInfo.ppEnabledExtensionNames = Context::instance()->getInstanceExtensions().data();
 
-    createInfo.enabledLayerCount = Application::instance()->getInstanceLayers().size();
-    createInfo.ppEnabledLayerNames = Application::instance()->getInstanceLayers().data();
+    createInfo.enabledLayerCount = Context::instance()->getInstanceLayers().size();
+    createInfo.ppEnabledLayerNames = Context::instance()->getInstanceLayers().data();
 
     if (Application::instance()->debug())
     {

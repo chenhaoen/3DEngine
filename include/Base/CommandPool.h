@@ -2,16 +2,13 @@
 
 #include <vulkan/vulkan.h>
 
-class LogicalDevice;
 class CommandPool
 {
 public:
-    CommandPool(LogicalDevice* device);
+    CommandPool();
     ~CommandPool();
 
     VkCommandPool getVkCommandPool() const;
 private:
     VkCommandPool m_vkCommandPool;
-
-    LogicalDevice* m_device;
 };

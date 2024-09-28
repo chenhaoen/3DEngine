@@ -5,16 +5,12 @@
 class Layer;
 class OverlayLayer;
 class SceneLayer;
-class Instance;
-class LogicalDevice;
 class Window;
-class RenderPass;
-class SwapChain;
 class Frame;
 class LayerManager
 {
 public:
-    LayerManager(Instance *instance, LogicalDevice *device, Window *window, SwapChain *swapChain, RenderPass *renderPass);
+    LayerManager(Window *window);
     ~LayerManager();
 
     void recordCommandBuffer(Frame *frame);

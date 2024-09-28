@@ -7,15 +7,16 @@
 #include "Base/CommandPool.h"
 #include "Base/Frame.h"
 #include "Base/LayerManager.h"
+#include "Base/Context.h"
 
-FrameManager::FrameManager(LogicalDevice *device, SwapChain *swapChain, RenderPass *renderPass)
-    : m_currentFrame(0), m_device(device), m_swapChain(swapChain), m_renderPass(renderPass)
+FrameManager::FrameManager()
+:m_currentFrame(0)
 {
-    m_commandPool = new CommandPool(device);
+    m_commandPool = new CommandPool();
 
     for (uint32_t i = 0; i < Application::maxFrameCount(); ++i)
     {
-        m_frames.push_back(new Frame(m_device, m_commandPool, swapChain, m_renderPass));
+        m_frames.push_back(new Frame(m_commandPool));
     }
 }
 

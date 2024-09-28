@@ -41,14 +41,9 @@ const std::vector<uint16_t> indices = {
 class BASE_API Node
 {
 public:
-	Node(LogicalDevice *device, SwapChain *swapChain, DescriptorSetLayout* descriptorSetLayout);
+	Node();
 	~Node();
 
-	void drawFrame(RenderPass *renderPass, Pipeline *pipeline);
-
-	void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex, RenderPass *renderPass, Pipeline *pipeline);
-
-	VkDescriptorPool getVkDescriptorPool() const;
 private:
 	void createVertexBuffer();
 
@@ -71,12 +66,6 @@ private:
 
 	VkCommandPool m_commandPool;
 	std::vector<VkCommandBuffer> m_commandBuffers;
-
-	std::vector<VkSemaphore> m_imageAvailableSemaphores;
-	std::vector<VkSemaphore> m_renderFinishedSemaphores;
-	std::vector<VkFence> m_inFlightFences;
-
-	uint32_t m_currentFrame;
 
 	VkBuffer m_vertexBuffer;
 	VkDeviceMemory m_vertexBufferMemory;

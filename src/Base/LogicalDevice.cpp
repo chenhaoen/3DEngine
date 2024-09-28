@@ -4,6 +4,7 @@
 #include "Base/LogicalDevice.h"
 #include "Base/PhysicalDevice.h"
 #include "Base/Application.h"
+#include "Base/Context.h"
 
 LogicalDevice::LogicalDevice(PhysicalDevice* physicalDevice)
 	:m_physicalDevice(physicalDevice)
@@ -30,12 +31,12 @@ LogicalDevice::LogicalDevice(PhysicalDevice* physicalDevice)
 	VkPhysicalDeviceFeatures deviceFeatures{};
 	createInfo.pEnabledFeatures = &deviceFeatures;
 
-	createInfo.enabledExtensionCount = Application::instance()->getDeviceExtensions().size();
-	createInfo.ppEnabledExtensionNames = Application::instance()->getDeviceExtensions().data();
+	createInfo.enabledExtensionCount = Context::instance()->getDeviceExtensions().size();
+	createInfo.ppEnabledExtensionNames = Context::instance()->getDeviceExtensions().data();
 
 	if (Application::instance()->debug()) {
-		createInfo.enabledLayerCount = Application::instance()->getInstanceLayers().size();
-		createInfo.ppEnabledLayerNames = Application::instance()->getInstanceLayers().data();
+		createInfo.enabledLayerCount = Context::instance()->getInstanceLayers().size();
+		createInfo.ppEnabledLayerNames = Context::instance()->getInstanceLayers().data();
 	}
 	else {
 		createInfo.enabledLayerCount = 0;

@@ -4,18 +4,11 @@
 
 #include <vulkan/vulkan.h>
 
-class LogicalDevice;
 class CommandPool;
-class SwapChain;
-class RenderPass;
 class Frame
 {
 public:
-    Frame(
-        LogicalDevice *device,
-        CommandPool *commandPool,
-        SwapChain *swapChain,
-        RenderPass *renderPass);
+    Frame(CommandPool *commandPool);
     ~Frame();
 
     VkCommandBuffer getCommandBuffer() const;
@@ -26,10 +19,7 @@ public:
     void setClearValue(VkClearValue clearValue);
     VkClearValue getClearVaule() const;
 private:
-    LogicalDevice *m_device;
     CommandPool *m_commandPool;
-    SwapChain *m_swapChain;
-    RenderPass *m_renderPass;
 
     VkCommandBuffer m_commandBuffer;
 

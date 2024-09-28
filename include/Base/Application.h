@@ -6,17 +6,10 @@
 #include "Base/Exports.h"
 
 class Window;
-class Instance;
-class DebugUtilsMessenger;
-class PhysicalDevice;
-class LogicalDevice;
-class Surface;
-class SwapChain;
 class Event;
 class FrameManager;
 class LayerManager;
-class RenderPass;
-
+class Context;
 class BASE_API Application
 {
 public:
@@ -27,9 +20,6 @@ public:
 
 	bool debug() const;
 
-	const std::vector<const char *> &getInstanceExtensions() const;
-	const std::vector<const char *> &getDeviceExtensions() const;
-	const std::vector<const char *> &getInstanceLayers() const;
 	const std::string_view &getName() const;
 
 	void onEvent(Event &event);
@@ -40,19 +30,9 @@ public:
 
 private:
 	Window *m_mainWindow;
-	Instance *m_instance;
-	Surface *m_surface;
-	SwapChain *m_swapChain;
-	DebugUtilsMessenger *m_debugUtilsMessenger;
-	PhysicalDevice *m_physicalDevice;
-	LogicalDevice *m_logicalDevice;
-	RenderPass *m_renderPass;
 	FrameManager *m_frameManager;
 	LayerManager *m_layerManager;
-
-	std::vector<const char *> m_instanceExtensions;
-	std::vector<const char *> m_instanceLayers;
-	std::vector<const char *> m_deviceExtensions;
+	Context* m_context;
 
 	bool m_debug;
 	std::string_view m_name;

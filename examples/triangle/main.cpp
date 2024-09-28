@@ -1,4 +1,5 @@
 #include "Base/Application.h"
+#include "Nodes/Group.h"
 
 int main(int argc, char** argv)
 {

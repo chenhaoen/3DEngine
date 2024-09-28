@@ -9,9 +9,10 @@
 #include "Base/PhysicalDevice.h"
 #include "Base/Instance.h"
 #include "Base/RenderPass.h"
+#include "Base/Context.h"
 
-OverlayLayer::OverlayLayer(Instance *instance, LogicalDevice *device, Window *window, SwapChain *swapChain, RenderPass *renderPass)
-	: Layer(instance, device, window, swapChain, renderPass)
+OverlayLayer::OverlayLayer(Window *window)
+	: Layer(window)
 {
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -31,20 +32,20 @@ OverlayLayer::OverlayLayer(Instance *instance, LogicalDevice *device, Window *wi
 	pool_info.maxSets = 1;
 	pool_info.poolSizeCount = (uint32_t)IM_ARRAYSIZE(pool_sizes);
 	pool_info.pPoolSizes = pool_sizes;
-	vkCreateDescriptorPool(m_device->getVkDevice(), &pool_info, nullptr, &m_descriptorPool);
+	vkCreateDescriptorPool(Context::instance()->getDevice()->getVkDevice(), &pool_info, nullptr, &m_descriptorPool);
 
 	ImGui::StyleColorsDark();
 
 	ImGui_ImplGlfw_InitForVulkan((GLFWwindow *)(m_window->naviteWindow()), true);
 	ImGui_ImplVulkan_InitInfo init_info = {};
-	init_info.Instance = m_instance->getVkInstance();
-	init_info.PhysicalDevice = m_device->getPhysicalDevice()->getVkPhysicalDevice();
-	init_info.Device = m_device->getVkDevice();
-	init_info.QueueFamily = m_device->getPhysicalDevice()->getGraphicsFamilyIndex();
-	init_info.Queue = m_device->getGraphicsQueue();
+	init_info.Instance = Context::instance()->getInsance()->getVkInstance();
+	init_info.PhysicalDevice = Context::instance()->getDevice()->getPhysicalDevice()->getVkPhysicalDevice();
+	init_info.Device = Context::instance()->getDevice()->getVkDevice();
+	init_info.QueueFamily = Context::instance()->getDevice()->getPhysicalDevice()->getGraphicsFamilyIndex();
+	init_info.Queue = Context::instance()->getDevice()->getGraphicsQueue();
 	init_info.PipelineCache = nullptr;
 	init_info.DescriptorPool = m_descriptorPool;
-	init_info.RenderPass = m_renderPass->getVkRenderPass();
+	init_info.RenderPass = Context::instance()->getRenderPass()->getVkRenderPass();
 	init_info.Subpass = 0;
 	init_info.MinImageCount = 2;
 	init_info.ImageCount = 3;
@@ -60,11 +61,11 @@ OverlayLayer::~OverlayLayer()
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
 
-	vkDestroyDescriptorPool(m_device->getVkDevice(), m_descriptorPool, nullptr);
+	vkDestroyDescriptorPool(Context::instance()->getDevice()->getVkDevice(), m_descriptorPool, nullptr);
 }
 
 // Our state
-bool show_demo_window = true;
+bool show_demo_window = false;
 bool show = true;
 bool show_another_window = false;
 ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
@@ -79,7 +80,6 @@ void OverlayLayer::recordCommandBuffer(Frame *frame)
 	// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
 	if (show_demo_window)
 	{
-
 		ImGui::ShowDemoWindow(&show_demo_window);
 	}
 
@@ -88,12 +88,21 @@ void OverlayLayer::recordCommandBuffer(Frame *frame)
 		static float f = 0.0f;
 		static int counter = 0;
 
-		ImGui::Begin("Hello, world!"); // Create a window called "Hello, world!" and append into it.
+		//ImGui::Begin("Hello, world!"); // Create a window called "Hello, world!" and append into it.
 
 		if (ImGui::BeginMainMenuBar())
 		{
 			if (ImGui::BeginMenu("File"))
 			{
+
+				if (ImGui::MenuItem("Open"))
+				{
+				}
+
+				if (ImGui::MenuItem("Exit"))
+				{
+				}
+
 				ImGui::EndMenu();
 			}
 			if (ImGui::BeginMenu("Edit"))
@@ -119,20 +128,20 @@ void OverlayLayer::recordCommandBuffer(Frame *frame)
 			ImGui::EndMainMenuBar();
 		}
 
-		ImGui::Text("This is some useful text.");		   // Display some text (you can use a format strings too)
-		ImGui::Checkbox("Demo Window", &show_demo_window); // Edit bools storing our window open/close state
-		ImGui::Checkbox("Another Window", &show_another_window);
+		// ImGui::Text("This is some useful text.");		   // Display some text (you can use a format strings too)
+		// ImGui::Checkbox("Demo Window", &show_demo_window); // Edit bools storing our window open/close state
+		// ImGui::Checkbox("Another Window", &show_another_window);
 
-		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);			 // Edit 1 float using a slider from 0.0f to 1.0f
-		ImGui::ColorEdit3("clear color", (float *)&clear_color); // Edit 3 floats representing a color
+		// ImGui::SliderFloat("float", &f, 0.0f, 1.0f);			 // Edit 1 float using a slider from 0.0f to 1.0f
+		// ImGui::ColorEdit3("clear color", (float *)&clear_color); // Edit 3 floats representing a color
 
-		if (ImGui::Button("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
-			counter++;
-		ImGui::SameLine();
-		ImGui::Text("counter = %d", counter);
+		// if (ImGui::Button("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
+		// 	counter++;
+		// ImGui::SameLine();
+		// ImGui::Text("counter = %d", counter);
 
 		// ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-		ImGui::End();
+		//ImGui::End();
 	}
 
 	// 3. Show another simple window.

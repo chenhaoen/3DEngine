@@ -7,7 +7,7 @@
 class OverlayLayer : public Layer
 {
 public:
-    OverlayLayer(Instance *instance, LogicalDevice *device, Window *window, SwapChain *swapChain, RenderPass* renderPass);
+    OverlayLayer(Window *window);
     ~OverlayLayer();
 
     void recordCommandBuffer(Frame *frame) override;
