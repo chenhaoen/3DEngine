@@ -1,8 +1,9 @@
 #include <stdexcept>
 
-#include "Base/CommandPool.h"
-#include "Base/LogicalDevice.h"
-#include "Base/PhysicalDevice.h"
+#include "Vk/CommandPool.h"
+#include "Vk/LogicalDevice.h"
+#include "Vk/PhysicalDevice.h"
+
 #include "Base/Context.h"
 
 CommandPool::CommandPool()

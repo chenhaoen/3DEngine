@@ -1,11 +1,12 @@
 #include <stdexcept>
 
 #include "Base/Frame.h"
-#include "Base/LogicalDevice.h"
-#include "Base/CommandPool.h"
-#include "Base/SwapChain.h"
-#include "Base/RenderPass.h"
 #include "Base/Context.h"
+
+#include "Vk/LogicalDevice.h"
+#include "Vk/CommandPool.h"
+#include "Vk/SwapChain.h"
+#include "Vk/RenderPass.h"
 
 Frame::Frame(CommandPool *commandPool)
     : m_commandPool(commandPool)

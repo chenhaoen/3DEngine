@@ -1,11 +1,12 @@
 #include <fstream>
 #include <filesystem>
 
-#include "Base/Pipeline.h"
-#include "Base/LogicalDevice.h"
-#include "Base/SwapChain.h"
-#include "Base/RenderPass.h"
-#include "Base/DescriptorSetLayout.h"
+#include "Vk/Pipeline.h"
+#include "Vk/LogicalDevice.h"
+#include "Vk/SwapChain.h"
+#include "Vk/RenderPass.h"
+#include "Vk/DescriptorSetLayout.h"
+
 #include "Nodes/Node.h"
 
 Pipeline::Pipeline(

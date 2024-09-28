@@ -11,6 +11,8 @@ public:
     Group();
     ~Group();
 
+    void addChildren(Node* children);
+    
 private:
     std::vector<Node *> m_childrens;
 };

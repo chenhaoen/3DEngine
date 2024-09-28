@@ -7,12 +7,12 @@
 
 #include "Nodes/Node.h"
 
-#include "Base/Pipeline.h"
-#include "Base/RenderPass.h"
-#include "Base/LogicalDevice.h"
-#include "Base/PhysicalDevice.h"
-#include "Base/SwapChain.h"
-#include "Base/DescriptorSetLayout.h"
+#include "Vk/Pipeline.h"
+#include "Vk/RenderPass.h"
+#include "Vk/LogicalDevice.h"
+#include "Vk/PhysicalDevice.h"
+#include "Vk/SwapChain.h"
+#include "Vk/DescriptorSetLayout.h"
 
 Node::Node()
 {

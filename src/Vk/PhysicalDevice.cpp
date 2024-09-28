@@ -1,9 +1,10 @@
 #include <iostream>
 
-#include "Base/PhysicalDevice.h"
-#include "Base/Instance.h"
+#include "Vk/PhysicalDevice.h"
+#include "Vk/Instance.h"
+#include "Vk/Surface.h"
+
 #include "Base/Application.h"
-#include "Base/Surface.h"
 
 PhysicalDevice::PhysicalDevice(VkPhysicalDevice vkPhysicalDevice,
 	Instance* instance,

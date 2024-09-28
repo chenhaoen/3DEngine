@@ -4,10 +4,11 @@
 #include <GLFW/glfw3.h>
 
 #include "Base/Window.h"
-#include "Base/Instance.h"
-#include "Base/Surface.h"
 #include "Base/Application.h"
 #include "Base/Event.h"
+
+#include "Vk/Instance.h"
+#include "Vk/Surface.h"
 
 namespace
 {

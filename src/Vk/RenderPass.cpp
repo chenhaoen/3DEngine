@@ -1,8 +1,8 @@
 #include <stdexcept>
 
-#include "Base/RenderPass.h"
-#include "Base/SwapChain.h"
-#include "Base/LogicalDevice.h"
+#include "Vk/RenderPass.h"
+#include "Vk/SwapChain.h"
+#include "Vk/LogicalDevice.h"
 
 RenderPass::RenderPass(LogicalDevice* device, SwapChain* swapChain)
     :m_device(device)

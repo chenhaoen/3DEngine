@@ -5,11 +5,12 @@
 #include "Base/OverlayLayer.h"
 #include "Base/Frame.h"
 #include "Base/Window.h"
-#include "Base/LogicalDevice.h"
-#include "Base/PhysicalDevice.h"
-#include "Base/Instance.h"
-#include "Base/RenderPass.h"
 #include "Base/Context.h"
+
+#include "Vk/LogicalDevice.h"
+#include "Vk/PhysicalDevice.h"
+#include "Vk/Instance.h"
+#include "Vk/RenderPass.h"
 
 OverlayLayer::OverlayLayer(Window *window)
 	: Layer(window)

@@ -1,10 +1,11 @@
 #include <stdexcept>
 #include <iostream>
 
-#include "Base/Instance.h"
-#include "Base/DebugUtilsMessenger.h"
+#include "Vk/Instance.h"
+#include "Vk/DebugUtilsMessenger.h"
+#include "Vk/PhysicalDevice.h"
+
 #include "Base/Application.h"
-#include "Base/PhysicalDevice.h"
 #include "Base/Context.h"
 
 Instance::Instance()

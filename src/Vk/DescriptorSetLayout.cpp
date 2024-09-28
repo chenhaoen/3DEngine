@@ -1,7 +1,7 @@
 #include <stdexcept>
 
-#include "Base/DescriptorSetLayout.h"
-#include "Base/LogicalDevice.h"
+#include "Vk/DescriptorSetLayout.h"
+#include "Vk/LogicalDevice.h"
 
 DescriptorSetLayout::DescriptorSetLayout(LogicalDevice *device)
     : m_device(device)

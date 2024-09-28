@@ -1,15 +1,16 @@
 #include <stdexcept>
 
 #include "Base/Context.h"
-#include "Base/Instance.h"
-#include "Base/DebugUtilsMessenger.h"
-#include "Base/LogicalDevice.h"
-#include "Base/PhysicalDevice.h"
-#include "Base/Surface.h"
-#include "Base/SwapChain.h"
-#include "Base/RenderPass.h"
 #include "Base/Window.h"
 #include "Base/Application.h"
+
+#include "Vk/Instance.h"
+#include "Vk/DebugUtilsMessenger.h"
+#include "Vk/LogicalDevice.h"
+#include "Vk/PhysicalDevice.h"
+#include "Vk/Surface.h"
+#include "Vk/SwapChain.h"
+#include "Vk/RenderPass.h"
 
 Context *Context::g_context = nullptr;
 

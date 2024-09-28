@@ -1,5 +1,6 @@
-#include "Base/Surface.h"
-#include "Base/Instance.h"
+#include "Vk/Surface.h"
+#include "Vk/Instance.h"
+
 #include "Base/Window.h"
 
 Surface::Surface(Instance* instance, Window* window)

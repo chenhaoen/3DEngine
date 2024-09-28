@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "Base/DebugUtilsMessenger.h"
-#include "Base/Instance.h"
+#include "Vk/DebugUtilsMessenger.h"
+#include "Vk/Instance.h"
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 	VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,

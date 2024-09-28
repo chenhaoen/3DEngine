@@ -9,8 +9,9 @@
 #include "Base/FrameManager.h"
 #include "Base/LayerManager.h"
 #include "Base/Context.h"
-#include "Base/LogicalDevice.h"
-#include "Base/SwapChain.h"
+
+#include "Vk/LogicalDevice.h"
+#include "Vk/SwapChain.h"
 
 Application *Application::g_instance = nullptr;
 

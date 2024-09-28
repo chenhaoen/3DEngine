@@ -2,12 +2,13 @@
 #include <stdexcept>
 #include <limits>
 
-#include "Base/SwapChain.h"
-#include "Base/PhysicalDevice.h"
-#include "Base/Surface.h"
+#include "Vk/SwapChain.h"
+#include "Vk/PhysicalDevice.h"
+#include "Vk/Surface.h"
+#include "Vk/LogicalDevice.h"
+#include "Vk/RenderPass.h"
+
 #include "Base/Window.h"
-#include "Base/LogicalDevice.h"
-#include "Base/RenderPass.h"
 
 SwapChain::SwapChain(
     LogicalDevice* device,

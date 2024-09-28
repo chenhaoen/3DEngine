@@ -1,8 +1,9 @@
 #include <stdexcept>
 #include <set>
 
-#include "Base/LogicalDevice.h"
-#include "Base/PhysicalDevice.h"
+#include "Vk/LogicalDevice.h"
+#include "Vk/PhysicalDevice.h"
+
 #include "Base/Application.h"
 #include "Base/Context.h"
 
