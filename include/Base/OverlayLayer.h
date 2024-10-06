@@ -8,7 +8,7 @@ class OverlayLayer : public Layer
 {
 public:
     OverlayLayer(Window *window);
-    ~OverlayLayer();
+    ~OverlayLayer() override;
 
     void recordCommandBuffer(Frame *frame) override;
 

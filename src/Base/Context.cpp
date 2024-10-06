@@ -79,7 +79,7 @@ void Context::init()
 
     if (Application::instance()->debug())
     {
-        m_debugUtilsMessenger = new DebugUtilsMessenger(m_instance);
+        m_debugUtilsMessenger = new DebugUtilsMessenger();
     }
 
     m_physicalDevice = m_instance->getBestPhysicalDevice(m_surface);

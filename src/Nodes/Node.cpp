@@ -16,87 +16,54 @@
 
 Node::Node()
 {
-	PhysicalDevice *physicalDevice = nullptr;
-
-	VkCommandPoolCreateInfo poolInfo{};
-	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-	poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-	poolInfo.queueFamilyIndex = physicalDevice->getGraphicsFamilyIndex();
-
-	// if (vkCreateCommandPool(device->getVkDevice(), &poolInfo, nullptr, &m_commandPool) != VK_SUCCESS)
-	// {
-	// 	throw std::runtime_error("failed to create command pool!");
-	// }
-
-	m_commandBuffers.resize(Application::maxFrameCount());
-
-	createVertexBuffer();
-	createIndexBuffer();
-	createUniformBuffers();
-	createDescriptorPool();
-	//createDescriptorSets();
 }
 
 Node::~Node()
 {
-	vkDestroyDescriptorPool(m_device->getVkDevice(), m_descriptorPool, nullptr);
 
-	vkDestroyBuffer(m_device->getVkDevice(), m_vertexBuffer, nullptr);
-	vkFreeMemory(m_device->getVkDevice(), m_vertexBufferMemory, nullptr);
-
-	vkDestroyBuffer(m_device->getVkDevice(), m_indexBuffer, nullptr);
-	vkFreeMemory(m_device->getVkDevice(), m_indexBufferMemory, nullptr);
-
-	for (size_t i = 0; i < Application::maxFrameCount(); i++)
-	{
-		vkDestroyBuffer(m_device->getVkDevice(), m_uniformBuffers[i], nullptr);
-		vkFreeMemory(m_device->getVkDevice(), m_uniformBuffersMemory[i], nullptr);
-	}
-
-	vkDestroyCommandPool(m_device->getVkDevice(), m_commandPool, nullptr);
 }
 
 
 void Node::createVertexBuffer()
 {
-	VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+	// VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 
-	VkBuffer stagingBuffer;
-	VkDeviceMemory stagingBufferMemory;
-	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+	// VkBuffer stagingBuffer;
+	// VkDeviceMemory stagingBufferMemory;
+	// createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
-	void *data;
-	vkMapMemory(m_device->getVkDevice(), stagingBufferMemory, 0, bufferSize, 0, &data);
-	memcpy(data, vertices.data(), (size_t)bufferSize);
-	vkUnmapMemory(m_device->getVkDevice(), stagingBufferMemory);
+	// void *data;
+	// vkMapMemory(m_device->getVkDevice(), stagingBufferMemory, 0, bufferSize, 0, &data);
+	// memcpy(data, vertices.data(), (size_t)bufferSize);
+	// vkUnmapMemory(m_device->getVkDevice(), stagingBufferMemory);
 
-	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_vertexBuffer, m_vertexBufferMemory);
+	// createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_vertexBuffer, m_vertexBufferMemory);
 
-	copyBuffer(stagingBuffer, m_vertexBuffer, bufferSize);
+	// copyBuffer(stagingBuffer, m_vertexBuffer, bufferSize);
 
-	vkDestroyBuffer(m_device->getVkDevice(), stagingBuffer, nullptr);
-	vkFreeMemory(m_device->getVkDevice(), stagingBufferMemory, nullptr);
+	// vkDestroyBuffer(m_device->getVkDevice(), stagingBuffer, nullptr);
+	// vkFreeMemory(m_device->getVkDevice(), stagingBufferMemory, nullptr);
 }
 
 void Node::createIndexBuffer()
 {
-	VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+	// VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
 
-	VkBuffer stagingBuffer;
-	VkDeviceMemory stagingBufferMemory;
-	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+	// VkBuffer stagingBuffer;
+	// VkDeviceMemory stagingBufferMemory;
+	// createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
-	void *data;
-	vkMapMemory(m_device->getVkDevice(), stagingBufferMemory, 0, bufferSize, 0, &data);
-	memcpy(data, indices.data(), (size_t)bufferSize);
-	vkUnmapMemory(m_device->getVkDevice(), stagingBufferMemory);
+	// void *data;
+	// vkMapMemory(m_device->getVkDevice(), stagingBufferMemory, 0, bufferSize, 0, &data);
+	// memcpy(data, indices.data(), (size_t)bufferSize);
+	// vkUnmapMemory(m_device->getVkDevice(), stagingBufferMemory);
 
-	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_indexBuffer, m_indexBufferMemory);
+	// createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_indexBuffer, m_indexBufferMemory);
 
-	copyBuffer(stagingBuffer, m_indexBuffer, bufferSize);
+	// copyBuffer(stagingBuffer, m_indexBuffer, bufferSize);
 
-	vkDestroyBuffer(m_device->getVkDevice(), stagingBuffer, nullptr);
-	vkFreeMemory(m_device->getVkDevice(), stagingBufferMemory, nullptr);
+	// vkDestroyBuffer(m_device->getVkDevice(), stagingBuffer, nullptr);
+	// vkFreeMemory(m_device->getVkDevice(), stagingBufferMemory, nullptr);
 }
 
 void Node::createUniformBuffers()
@@ -132,33 +99,6 @@ void Node::updateUniformBuffer(uint32_t currentFrame)
 	ubo.proj[1][1] *= -1;
 
 	memcpy(m_uniformBuffersMapped[currentFrame], &ubo, sizeof(ubo));
-}
-
-VkVertexInputBindingDescription Vertex::getBindingDescription()
-{
-	VkVertexInputBindingDescription bindingDescription{};
-	bindingDescription.binding = 0;
-	bindingDescription.stride = sizeof(Vertex);
-	bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-
-	return bindingDescription;
-}
-
-std::array<VkVertexInputAttributeDescription, 2> Vertex::getAttributeDescriptions()
-{
-	std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions{};
-
-	attributeDescriptions[0].binding = 0;
-	attributeDescriptions[0].location = 0;
-	attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
-	attributeDescriptions[0].offset = offsetof(Vertex, pos);
-
-	attributeDescriptions[1].binding = 0;
-	attributeDescriptions[1].location = 1;
-	attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-	attributeDescriptions[1].offset = offsetof(Vertex, color);
-
-	return attributeDescriptions;
 }
 
 void Node::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory)

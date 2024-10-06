@@ -1,13 +1,18 @@
 #pragma once
 
+#include <vector>
+
 #include "Nodes/Node.h"
 
+class Geometry;
 class Geode : public Node
 {
-    public:
+public:
     Geode();
     ~Geode();
 
-    private:
-    
-}
+    void addGeometry(Geometry* geometry);
+
+private:
+    std::vector<Geometry *> m_geometices;
+};

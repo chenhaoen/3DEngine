@@ -10,6 +10,7 @@ class Event;
 class FrameManager;
 class LayerManager;
 class Context;
+class Node;
 class BASE_API Application
 {
 public:

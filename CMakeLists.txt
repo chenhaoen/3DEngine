@@ -13,4 +13,4 @@ include_directories(${INCLUDE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/examples)
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src/Base)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src)

@@ -5,8 +5,12 @@
 class Node;
 class SceneLayer : public Layer
 {
-    SceneLayer();
+public:
+    SceneLayer(Window *window);
+    ~SceneLayer() override;
 
-    private:
-    Node* m_rootNode;
+    void recordCommandBuffer(Frame *frame) override;
+
+private:
+    Node *m_rootNode;
 };

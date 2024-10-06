@@ -3,8 +3,9 @@
 #include "Vk/DescriptorSetLayout.h"
 #include "Vk/LogicalDevice.h"
 
-DescriptorSetLayout::DescriptorSetLayout(LogicalDevice *device)
-    : m_device(device)
+#include "Base/Context.h"
+
+DescriptorSetLayout::DescriptorSetLayout()
 {
     VkDescriptorSetLayoutBinding uboLayoutBinding{};
     uboLayoutBinding.binding = 0;
@@ -18,7 +19,7 @@ DescriptorSetLayout::DescriptorSetLayout(LogicalDevice *device)
     layoutInfo.bindingCount = 1;
     layoutInfo.pBindings = &uboLayoutBinding;
 
-    if (vkCreateDescriptorSetLayout(m_device->getVkDevice(), &layoutInfo, nullptr, &m_descriptorSetLayout) != VK_SUCCESS)
+    if (vkCreateDescriptorSetLayout(Context::instance()->getDevice()->getVkDevice(), &layoutInfo, nullptr, &m_descriptorSetLayout) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create descriptor set layout!");
     }
@@ -26,7 +27,7 @@ DescriptorSetLayout::DescriptorSetLayout(LogicalDevice *device)
 
 DescriptorSetLayout::~DescriptorSetLayout()
 {
-    vkDestroyDescriptorSetLayout(m_device->getVkDevice(), m_descriptorSetLayout, nullptr);
+    vkDestroyDescriptorSetLayout(Context::instance()->getDevice()->getVkDevice(), m_descriptorSetLayout, nullptr);
 }
 
 VkDescriptorSetLayout DescriptorSetLayout::getVkDescriptorSetLayout() const

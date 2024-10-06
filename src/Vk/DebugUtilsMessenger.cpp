@@ -3,6 +3,8 @@
 #include "Vk/DebugUtilsMessenger.h"
 #include "Vk/Instance.h"
 
+#include "Base/Context.h"
+
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 	VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 	VkDebugUtilsMessageTypeFlagsEXT messageType,
@@ -34,20 +36,19 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 	}
 }
 
-DebugUtilsMessenger::DebugUtilsMessenger(Instance* instance)
-	:m_instance(instance)
+DebugUtilsMessenger::DebugUtilsMessenger()
 {
 	VkDebugUtilsMessengerCreateInfoEXT createInfo{};
 	populateDebugMessengerCreateInfo(createInfo);
 
-	if (CreateDebugUtilsMessengerEXT(m_instance->getVkInstance(), &createInfo, nullptr, &m_vkDebugUtilsMessenger) != VK_SUCCESS) {
+	if (CreateDebugUtilsMessengerEXT(Context::instance()->getInsance()->getVkInstance(), &createInfo, nullptr, &m_vkDebugUtilsMessenger) != VK_SUCCESS) {
 		throw std::runtime_error("failed to set up debug messenger!");
 	}
 }
 
 DebugUtilsMessenger::~DebugUtilsMessenger()
 {
-	DestroyDebugUtilsMessengerEXT(m_instance->getVkInstance(), m_vkDebugUtilsMessenger, nullptr);
+	DestroyDebugUtilsMessengerEXT(Context::instance()->getInsance()->getVkInstance(), m_vkDebugUtilsMessenger, nullptr);
 }
 
 void DebugUtilsMessenger::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)

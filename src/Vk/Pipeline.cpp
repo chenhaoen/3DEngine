@@ -1,6 +1,8 @@
 #include <fstream>
 #include <filesystem>
 
+#include "Base/Context.h"
+
 #include "Vk/Pipeline.h"
 #include "Vk/LogicalDevice.h"
 #include "Vk/SwapChain.h"
@@ -8,14 +10,11 @@
 #include "Vk/DescriptorSetLayout.h"
 
 #include "Nodes/Node.h"
+#include "Nodes/Geometry.h"
 
 Pipeline::Pipeline(
-    LogicalDevice *device,
-    SwapChain *swapChain,
-    RenderPass *renderPass,
     DescriptorSetLayout *descriptorSetLayout)
-    : m_device(device), m_descriptorSetLayout(descriptorSetLayout)
-
+    : m_descriptorSetLayout(descriptorSetLayout)
 {
     auto vertShaderCode = readFile("shaders/vert.spv");
     auto fragShaderCode = readFile("shaders/frag.spv");
@@ -61,7 +60,7 @@ Pipeline::Pipeline(
     inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     inputAssembly.primitiveRestartEnable = VK_FALSE;
 
-    VkExtent2D swapChainExtent = swapChain->getExtent();
+    VkExtent2D swapChainExtent = Context::instance()->getSwapChain()->getExtent();
 
     VkViewport viewport{};
     viewport.x = 0.0f;
@@ -135,7 +134,7 @@ Pipeline::Pipeline(
     pipelineLayoutInfo.pushConstantRangeCount = 0;         // Optional
     pipelineLayoutInfo.pPushConstantRanges = nullptr;      // Optional
 
-    if (vkCreatePipelineLayout(device->getVkDevice(), &pipelineLayoutInfo, nullptr, &m_layout) != VK_SUCCESS)
+    if (vkCreatePipelineLayout(Context::instance()->getDevice()->getVkDevice(), &pipelineLayoutInfo, nullptr, &m_layout) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create pipeline layout!");
     }
@@ -155,22 +154,22 @@ Pipeline::Pipeline(
     pipelineInfo.pDynamicState = &dynamicState;
 
     pipelineInfo.layout = m_layout;
-    pipelineInfo.renderPass = renderPass->getVkRenderPass();
+    pipelineInfo.renderPass = Context::instance()->getRenderPass()->getVkRenderPass();
     pipelineInfo.subpass = 0;
 
-    if (vkCreateGraphicsPipelines(device->getVkDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_graphicsPipeline) != VK_SUCCESS)
+    if (vkCreateGraphicsPipelines(Context::instance()->getDevice()->getVkDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_graphicsPipeline) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create graphics pipeline!");
     }
 
-    vkDestroyShaderModule(device->getVkDevice(), fragShaderModule, nullptr);
-    vkDestroyShaderModule(device->getVkDevice(), vertShaderModule, nullptr);
+    vkDestroyShaderModule(Context::instance()->getDevice()->getVkDevice(), fragShaderModule, nullptr);
+    vkDestroyShaderModule(Context::instance()->getDevice()->getVkDevice(), vertShaderModule, nullptr);
 }
 
 Pipeline::~Pipeline()
 {
-    vkDestroyPipeline(m_device->getVkDevice(), m_graphicsPipeline, nullptr);
-    vkDestroyPipelineLayout(m_device->getVkDevice(), m_layout, nullptr);
+    vkDestroyPipeline(Context::instance()->getDevice()->getVkDevice(), m_graphicsPipeline, nullptr);
+    vkDestroyPipelineLayout(Context::instance()->getDevice()->getVkDevice(), m_layout, nullptr);
 }
 
 std::vector<char> Pipeline::readFile(const std::string &filename)
@@ -199,7 +198,7 @@ VkShaderModule Pipeline::createShaderModule(const std::vector<char> &code)
     createInfo.pCode = reinterpret_cast<const uint32_t *>(code.data());
 
     VkShaderModule shaderModule;
-    if (vkCreateShaderModule(m_device->getVkDevice(), &createInfo, nullptr, &shaderModule) != VK_SUCCESS)
+    if (vkCreateShaderModule(Context::instance()->getDevice()->getVkDevice(), &createInfo, nullptr, &shaderModule) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create shader module!");
     }

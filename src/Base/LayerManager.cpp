@@ -3,12 +3,16 @@
 
 #include "Base/LayerManager.h"
 #include "Base/OverlayLayer.h"
+#include "Base/SceneLayer.h"
 
 LayerManager::LayerManager(Window *window)
     : m_overlayLayer(nullptr), m_sceneLayer(nullptr)
 {
     m_overlayLayer = new OverlayLayer(window);
 
+    m_sceneLayer = new SceneLayer(window);
+    
+    m_layers.push_back(m_sceneLayer);
     m_layers.push_back(m_overlayLayer);
 }
 

@@ -1,5 +1,4 @@
 #include "Base/Application.h"
-#include "Nodes/Group.h"
 
 int main(int argc, char** argv)
 {
@@ -7,7 +6,6 @@ int main(int argc, char** argv)
 #ifndef NDEBUG
     debug = true;
 #endif // NDEBUG
-
     Application app("triangle", debug);
 
     return app.exec();
