@@ -24,6 +24,7 @@ set(ALL_SOURCES ${BASE_SOURCES} ${NODES_SOURCES} ${IMGUI_SOURCES} ${VK_SOURCES})
 add_library(${PROJECT_NAME} SHARED 
 ${ALL_HEADERS}
 ${ALL_SOURCES}
+${3DEngine_SOURCE_DIR}/3rd/stb/stb_image.h
 ${3DEngine_SOURCE_DIR}/3rd/imgui/backends/imgui_impl_vulkan.h
 ${3DEngine_SOURCE_DIR}/3rd/imgui/backends/imgui_impl_vulkan.cpp
 ${3DEngine_SOURCE_DIR}/3rd/imgui/backends/imgui_impl_glfw.h

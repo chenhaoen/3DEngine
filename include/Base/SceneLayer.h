@@ -3,6 +3,7 @@
 #include "Base/Layer.h"
 
 class Node;
+class Geometry;
 class SceneLayer : public Layer
 {
 public:
@@ -13,4 +14,6 @@ public:
 
 private:
     Node *m_rootNode;
+
+    Geometry* m_geometry;
 };

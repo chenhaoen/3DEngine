@@ -1,4 +1,12 @@
+#include <string.h>
+#include <stdexcept>
+
 #include "Nodes/Geometry.h"
+
+#include "Base/Context.h"
+
+#include "Vk/LogicalDevice.h"
+#include "Vk/PhysicalDevice.h"
 
 VkVertexInputBindingDescription Vertex::getBindingDescription()
 {
@@ -27,7 +35,193 @@ std::array<VkVertexInputAttributeDescription, 2> Vertex::getAttributeDescription
 	return attributeDescriptions;
 }
 
-void Geometry::setVertices(const std::vector<Vertex>& vertices)
+Geometry::Geometry()
+{
+	VkCommandPoolCreateInfo poolInfo{};
+	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+	poolInfo.queueFamilyIndex = Context::instance()->getDevice()->getPhysicalDevice()->getGraphicsFamilyIndex();
+
+	if (vkCreateCommandPool(Context::instance()->getDevice()->getVkDevice(), &poolInfo, nullptr, &m_commandPool) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to create graphics command pool!");
+	}
+}
+Geometry::~Geometry()
+{
+	vkDestroyBuffer(Context::instance()->getDevice()->getVkDevice(), m_indexBuffer, nullptr);
+
+	vkDestroyBuffer(Context::instance()->getDevice()->getVkDevice(), m_vertexBuffer, nullptr);
+	vkFreeMemory(Context::instance()->getDevice()->getVkDevice(), m_indexBufferMemory, nullptr);
+
+	vkDestroyCommandPool(Context::instance()->getDevice()->getVkDevice(), m_commandPool, nullptr);
+	vkFreeMemory(Context::instance()->getDevice()->getVkDevice(), m_vertexBufferMemory, nullptr);
+}
+
+void Geometry::setVertices(const std::vector<Vertex> &vertices)
 {
 	m_vertices = vertices;
+	createVertexBuffer();
+}
+
+void Geometry::setIndices(const std::vector<uint16_t> indices)
+{
+	m_indices = indices;
+	createIndexBuffer();
+}
+
+void Geometry::createVertexBuffer()
+{
+	VkDeviceSize bufferSize = sizeof(m_vertices[0]) * m_vertices.size();
+
+	VkBuffer stagingBuffer;
+	VkDeviceMemory stagingBufferMemory;
+	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+				 stagingBuffer, stagingBufferMemory);
+
+	void *data;
+	vkMapMemory(Context::instance()->getDevice()->getVkDevice(), stagingBufferMemory, 0, bufferSize, 0, &data);
+	memcpy(data, m_vertices.data(), (size_t)bufferSize);
+	vkUnmapMemory(Context::instance()->getDevice()->getVkDevice(), stagingBufferMemory);
+
+	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+				 m_vertexBuffer, m_vertexBufferMemory);
+
+	copyBuffer(stagingBuffer, m_vertexBuffer, bufferSize);
+
+	vkDestroyBuffer(Context::instance()->getDevice()->getVkDevice(), stagingBuffer, nullptr);
+	vkFreeMemory(Context::instance()->getDevice()->getVkDevice(), stagingBufferMemory, nullptr);
+}
+
+void Geometry::createIndexBuffer()
+{
+	VkDeviceSize bufferSize = sizeof(m_indices[0]) * m_indices.size();
+
+	VkBuffer stagingBuffer;
+	VkDeviceMemory stagingBufferMemory;
+	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+				 stagingBuffer, stagingBufferMemory);
+
+	void *data;
+	vkMapMemory(Context::instance()->getDevice()->getVkDevice(), stagingBufferMemory, 0, bufferSize, 0, &data);
+	memcpy(data, m_indices.data(), (size_t)bufferSize);
+	vkUnmapMemory(Context::instance()->getDevice()->getVkDevice(), stagingBufferMemory);
+
+	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+				 m_indexBuffer, m_indexBufferMemory);
+
+	copyBuffer(stagingBuffer, m_indexBuffer, bufferSize);
+
+	vkDestroyBuffer(Context::instance()->getDevice()->getVkDevice(), stagingBuffer, nullptr);
+	vkFreeMemory(Context::instance()->getDevice()->getVkDevice(), stagingBufferMemory, nullptr);
+}
+
+void Geometry::bind(VkCommandBuffer commandBuffer)
+{
+
+	VkBuffer vertexBuffers[] = {m_vertexBuffer};
+	VkDeviceSize offsets[] = {0};
+	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+
+	vkCmdBindIndexBuffer(commandBuffer, m_indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+}
+
+void Geometry::createUniformBuffers()
+{
+	// VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+
+	// m_uniformBuffers.resize(Application::maxFrameCount());
+	// m_uniformBuffersMemory.resize(Application::maxFrameCount());
+	// m_uniformBuffersMapped.resize(Application::maxFrameCount());
+
+	// for (size_t i = 0; i < Application::maxFrameCount(); i++)
+	// {
+	// 	createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, m_uniformBuffers[i], m_uniformBuffersMemory[i]);
+
+	// 	vkMapMemory(m_device->getVkDevice(), m_uniformBuffersMemory[i], 0, bufferSize, 0, &m_uniformBuffersMapped[i]);
+	// }
+}
+
+void Geometry::updateUniformBuffer(uint32_t currentFrame)
+{
+	// static auto startTime = std::chrono::high_resolution_clock::now();
+
+	// auto currentTime = std::chrono::high_resolution_clock::now();
+	// float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
+	// const auto &swapChainExtent = m_swapChain->getExtent();
+
+	// UniformBufferObject ubo{};
+	// ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	// ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	// ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
+
+	// ubo.proj[1][1] *= -1;
+
+	// memcpy(m_uniformBuffersMapped[currentFrame], &ubo, sizeof(ubo));
+}
+
+void Geometry::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory)
+{
+	VkBufferCreateInfo bufferInfo{};
+	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	bufferInfo.size = size;
+	bufferInfo.usage = usage;
+	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+	if (vkCreateBuffer(Context::instance()->getDevice()->getVkDevice(), &bufferInfo, nullptr, &buffer) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to create buffer!");
+	}
+
+	VkMemoryRequirements memRequirements;
+	vkGetBufferMemoryRequirements(Context::instance()->getDevice()->getVkDevice(), buffer, &memRequirements);
+
+	VkMemoryAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	allocInfo.allocationSize = memRequirements.size;
+	allocInfo.memoryTypeIndex = Context::instance()->getDevice()->getPhysicalDevice()->findMemoryType(memRequirements.memoryTypeBits, properties);
+
+	if (vkAllocateMemory(Context::instance()->getDevice()->getVkDevice(), &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to allocate buffer memory!");
+	}
+
+	vkBindBufferMemory(Context::instance()->getDevice()->getVkDevice(), buffer, bufferMemory, 0);
+}
+
+void Geometry::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
+{
+	VkCommandBufferAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandPool = m_commandPool;
+	allocInfo.commandBufferCount = 1;
+
+	VkCommandBuffer commandBuffer;
+	vkAllocateCommandBuffers(Context::instance()->getDevice()->getVkDevice(), &allocInfo, &commandBuffer);
+
+	VkCommandBufferBeginInfo beginInfo{};
+	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+	vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+	VkBufferCopy copyRegion{};
+	copyRegion.srcOffset = 0; // Optional
+	copyRegion.dstOffset = 0; // Optional
+	copyRegion.size = size;
+	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+
+	vkEndCommandBuffer(commandBuffer);
+
+	VkSubmitInfo submitInfo{};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &commandBuffer;
+
+	vkQueueSubmit(Context::instance()->getDevice()->getPresentQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+	vkQueueWaitIdle(Context::instance()->getDevice()->getPresentQueue());
+
+	vkFreeCommandBuffers(Context::instance()->getDevice()->getVkDevice(), m_commandPool, 1, &commandBuffer);
 }

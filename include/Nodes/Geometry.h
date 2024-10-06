@@ -16,17 +16,40 @@ struct Vertex
 	static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions();
 };
 
-
 class Geometry
 {
 public:
-    Geometry() = default;
-    ~Geometry() = default;
+	Geometry();
+	~Geometry();
 
-	void setVertices(const std::vector<Vertex>& vertices);
+	void setVertices(const std::vector<Vertex> &vertices);
+
+	void setIndices(const std::vector<uint16_t> indices);
+
+	void bind(VkCommandBuffer commandBuffer);
+
+	void createVertexBuffer();
+
+	void createIndexBuffer();
+
+	void createUniformBuffers();
+
+	void updateUniformBuffer(uint32_t currentFrame);
+
+	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory);
+
+	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
 private:
-    std::vector<Vertex> m_vertices;
+	std::vector<Vertex> m_vertices;
 
 	std::vector<uint16_t> m_indices;
+
+	VkBuffer m_vertexBuffer;
+	VkDeviceMemory m_vertexBufferMemory;
+
+	VkBuffer m_indexBuffer;
+	VkDeviceMemory m_indexBufferMemory;
+
+	VkCommandPool m_commandPool;
 };
