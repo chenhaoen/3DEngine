@@ -10,6 +10,8 @@ class Surface;
 class SwapChain;
 class RenderPass;
 class Window;
+class CommandPool;
+class DescriptorPool;
 class Context
 {
 public:
@@ -23,6 +25,8 @@ public:
     SwapChain* getSwapChain();
     LogicalDevice* getDevice();
     RenderPass* getRenderPass();
+    CommandPool* getCommandPool();
+    DescriptorPool* getDescriptorPool();
 
     void init();
 
@@ -43,6 +47,8 @@ private:
     PhysicalDevice *m_physicalDevice;
     LogicalDevice *m_logicalDevice;
     RenderPass *m_renderPass;
+    CommandPool* m_commandPool;
+    DescriptorPool* m_descriptorPool;
 
     std::vector<const char *> m_instanceExtensions;
     std::vector<const char *> m_instanceLayers;

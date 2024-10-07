@@ -8,12 +8,12 @@
 #include "Vk/SwapChain.h"
 #include "Vk/RenderPass.h"
 
-Frame::Frame(CommandPool *commandPool)
-    : m_commandPool(commandPool)
+Frame::Frame(uint32_t index)
+    : m_index(index)
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = m_commandPool->getVkCommandPool();
+    allocInfo.commandPool = Context::instance()->getCommandPool()->getVkCommandPool();
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandBufferCount = 1;
 
@@ -49,6 +49,11 @@ Frame::~Frame()
 VkCommandBuffer Frame::getCommandBuffer() const
 {
     return m_commandBuffer;
+}
+
+uint32_t Frame::getIndex() const
+{
+    return m_index;
 }
 
 void Frame::begin()
@@ -139,3 +144,4 @@ VkClearValue Frame::getClearVaule() const
 {
     return m_clearValue;
 }
+

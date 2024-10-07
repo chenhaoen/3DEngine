@@ -12,8 +12,8 @@ LayerManager::LayerManager(Window *window)
 
     m_sceneLayer = new SceneLayer(window);
 
-    m_layers.push_back(m_overlayLayer);
     m_layers.push_back(m_sceneLayer);
+    m_layers.push_back(m_overlayLayer);
 }
 
 LayerManager::~LayerManager()

@@ -11,6 +11,8 @@
 #include "Vk/Surface.h"
 #include "Vk/SwapChain.h"
 #include "Vk/RenderPass.h"
+#include "Vk/CommandPool.h"
+#include "Vk/DescriptorPool.h"
 
 Context *Context::g_context = nullptr;
 
@@ -22,6 +24,8 @@ Context::Context()
 
 Context::~Context()
 {
+    delete m_commandPool;
+    delete m_descriptorPool;
     delete m_renderPass;
     delete m_swapChain;
     delete m_logicalDevice;
@@ -54,6 +58,16 @@ LogicalDevice *Context::getDevice()
 RenderPass *Context::getRenderPass()
 {
     return m_renderPass;
+}
+
+CommandPool *Context::getCommandPool()
+{
+    return m_commandPool;
+}
+
+DescriptorPool *Context::getDescriptorPool()
+{
+    return m_descriptorPool;
 }
 
 void Context::init()
@@ -96,6 +110,10 @@ void Context::init()
 
     m_swapChain->setRenderPass(m_renderPass);
     m_swapChain->createFrameBuffers();
+
+    m_commandPool = new CommandPool();
+
+    m_descriptorPool = new DescriptorPool();
 }
 
 const std::vector<const char *> &Context::getInstanceExtensions() const

@@ -4,8 +4,8 @@
 #include <vector>
 
 class Frame;
-class CommandPool;
 class LayerManager;
+class DescriptorPool;
 class FrameManager
 {
 public:
@@ -14,7 +14,7 @@ public:
 
     void frame(LayerManager* layerManager);
 private:
-    CommandPool* m_commandPool;
+    DescriptorPool* m_descriptorPool;
 
     std::vector<Frame *> m_frames;
     uint32_t m_currentFrame;

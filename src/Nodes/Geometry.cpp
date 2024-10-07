@@ -7,6 +7,7 @@
 
 #include "Vk/LogicalDevice.h"
 #include "Vk/PhysicalDevice.h"
+#include "Vk/CommandPool.h"
 
 VkVertexInputBindingDescription Vertex::getBindingDescription()
 {
@@ -126,41 +127,6 @@ void Geometry::bind(VkCommandBuffer commandBuffer)
 	vkCmdBindIndexBuffer(commandBuffer, m_indexBuffer, 0, VK_INDEX_TYPE_UINT16);
 }
 
-void Geometry::createUniformBuffers()
-{
-	// VkDeviceSize bufferSize = sizeof(UniformBufferObject);
-
-	// m_uniformBuffers.resize(Application::maxFrameCount());
-	// m_uniformBuffersMemory.resize(Application::maxFrameCount());
-	// m_uniformBuffersMapped.resize(Application::maxFrameCount());
-
-	// for (size_t i = 0; i < Application::maxFrameCount(); i++)
-	// {
-	// 	createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, m_uniformBuffers[i], m_uniformBuffersMemory[i]);
-
-	// 	vkMapMemory(m_device->getVkDevice(), m_uniformBuffersMemory[i], 0, bufferSize, 0, &m_uniformBuffersMapped[i]);
-	// }
-}
-
-void Geometry::updateUniformBuffer(uint32_t currentFrame)
-{
-	// static auto startTime = std::chrono::high_resolution_clock::now();
-
-	// auto currentTime = std::chrono::high_resolution_clock::now();
-	// float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
-	// const auto &swapChainExtent = m_swapChain->getExtent();
-
-	// UniformBufferObject ubo{};
-	// ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	// ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	// ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
-
-	// ubo.proj[1][1] *= -1;
-
-	// memcpy(m_uniformBuffersMapped[currentFrame], &ubo, sizeof(ubo));
-}
-
 void Geometry::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory)
 {
 	VkBufferCreateInfo bufferInfo{};
@@ -195,7 +161,7 @@ void Geometry::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize s
 	VkCommandBufferAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandPool = m_commandPool;
+	allocInfo.commandPool = Context::instance()->getCommandPool()->getVkCommandPool();
 	allocInfo.commandBufferCount = 1;
 
 	VkCommandBuffer commandBuffer;
@@ -223,5 +189,5 @@ void Geometry::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize s
 	vkQueueSubmit(Context::instance()->getDevice()->getPresentQueue(), 1, &submitInfo, VK_NULL_HANDLE);
 	vkQueueWaitIdle(Context::instance()->getDevice()->getPresentQueue());
 
-	vkFreeCommandBuffers(Context::instance()->getDevice()->getVkDevice(), m_commandPool, 1, &commandBuffer);
+	vkFreeCommandBuffers(Context::instance()->getDevice()->getVkDevice(), Context::instance()->getCommandPool()->getVkCommandPool(), 1, &commandBuffer);
 }

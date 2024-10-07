@@ -1,5 +1,9 @@
 #pragma once
 
+#include <vector>
+
+#include <vulkan/vulkan.h>
+
 #include "Base/Layer.h"
 
 class Node;
@@ -12,8 +16,18 @@ public:
 
     void recordCommandBuffer(Frame *frame) override;
 
+    void updateUniformBuffer(Frame *frame);
+
+    void createUniformBuffers();
+
 private:
     Node *m_rootNode;
 
-    Geometry* m_geometry;
+    Geometry *m_geometry;
+
+    std::vector<VkDescriptorSet> m_descriptorSets;
+
+    std::vector<VkBuffer> m_uniformBuffers;
+    std::vector<VkDeviceMemory> m_uniformBuffersMemory;
+    std::vector<void *> m_uniformBuffersMapped;
 };
