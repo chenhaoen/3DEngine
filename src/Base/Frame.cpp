@@ -11,11 +11,7 @@
 Frame::Frame(uint32_t index)
     : m_index(index)
 {
-    VkCommandBufferAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = Context::instance()->getCommandPool()->getVkCommandPool();
-    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandBufferCount = 1;
+    m_commandBuffer = Context::instance()->getCommandPool()->createCommands();
 
     VkSemaphoreCreateInfo semaphoreInfo{};
     semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -23,11 +19,6 @@ Frame::Frame(uint32_t index)
     VkFenceCreateInfo fenceInfo{};
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-
-    if (vkAllocateCommandBuffers(Context::instance()->getDevice()->getVkDevice(), &allocInfo, &m_commandBuffer) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to allocate command buffers!");
-    }
 
     if (vkCreateSemaphore(Context::instance()->getDevice()->getVkDevice(), &semaphoreInfo, nullptr, &m_imageAvailableSemaphore) != VK_SUCCESS ||
         vkCreateSemaphore(Context::instance()->getDevice()->getVkDevice(), &semaphoreInfo, nullptr, &m_renderFinishedSemaphore) != VK_SUCCESS ||

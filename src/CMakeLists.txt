@@ -24,7 +24,6 @@ set(ALL_SOURCES ${BASE_SOURCES} ${NODES_SOURCES} ${IMGUI_SOURCES} ${VK_SOURCES})
 add_library(${PROJECT_NAME} SHARED 
 ${ALL_HEADERS}
 ${ALL_SOURCES}
-${3DEngine_SOURCE_DIR}/3rd/stb/stb_image.h
 ${3DEngine_SOURCE_DIR}/3rd/imgui/backends/imgui_impl_vulkan.h
 ${3DEngine_SOURCE_DIR}/3rd/imgui/backends/imgui_impl_vulkan.cpp
 ${3DEngine_SOURCE_DIR}/3rd/imgui/backends/imgui_impl_glfw.h
@@ -32,8 +31,10 @@ ${3DEngine_SOURCE_DIR}/3rd/imgui/backends/imgui_impl_glfw.cpp
 )
 
 add_compile_definitions(BASE_EXPORT)
+add_compile_definitions(STB_IMAGE_IMPLEMENTATION)
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
-${3DEngine_SOURCE_DIR}/3rd/imgui)
+${3DEngine_SOURCE_DIR}/3rd/imgui
+${3DEngine_SOURCE_DIR}/3rd/stb)
 
 target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan glfw)

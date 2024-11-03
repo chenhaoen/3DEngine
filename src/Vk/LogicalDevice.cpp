@@ -30,6 +30,7 @@ LogicalDevice::LogicalDevice(PhysicalDevice* physicalDevice)
 	createInfo.queueCreateInfoCount = queueCreateInfos.size();
 
 	VkPhysicalDeviceFeatures deviceFeatures{};
+	deviceFeatures.samplerAnisotropy = true;
 	createInfo.pEnabledFeatures = &deviceFeatures;
 
 	createInfo.enabledExtensionCount = Context::instance()->getDeviceExtensions().size();

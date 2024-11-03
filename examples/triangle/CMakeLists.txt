@@ -9,3 +9,5 @@ execute_process(COMMAND ${Vulkan_GLSLC_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/sha
 
 configure_file(${CMAKE_CURRENT_LIST_DIR}/shaders/vert.spv ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/shaders/vert.spv COPYONLY)
 configure_file(${CMAKE_CURRENT_LIST_DIR}/shaders/frag.spv ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/shaders/frag.spv COPYONLY)
+
+configure_file(${RESOURCES_DIR}/textures/texture.jpg ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/textures/texture.jpg COPYONLY)

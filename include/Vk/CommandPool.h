@@ -9,6 +9,9 @@ public:
     ~CommandPool();
 
     VkCommandPool getVkCommandPool() const;
+
+    VkCommandBuffer createCommands();
+    void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 private:
     VkCommandPool m_vkCommandPool;
 };
