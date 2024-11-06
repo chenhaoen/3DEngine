@@ -9,7 +9,7 @@
 
 struct Vertex
 {
-	glm::vec2 pos;
+	glm::vec3 pos;
 	glm::vec3 color;
 	glm::vec2 texCoord;
 
@@ -35,15 +35,6 @@ public:
 	void setIndices(const std::vector<uint16_t> indices);
 
 	void bind(VkCommandBuffer commandBuffer);
-
-	void createImage(uint32_t width,
-					 uint32_t height,
-					 VkFormat format,
-					 VkImageTiling tiling,
-					 VkImageUsageFlags usage,
-					 VkMemoryPropertyFlags properties,
-					 VkImage &image,
-					 VkDeviceMemory &imageMemory);
 
 	void createTextureImage();
 

@@ -92,6 +92,7 @@ void Application::onEvent(Event &event)
 	m_context->getSwapChain()->cleanup();
 	m_context->getSwapChain()->create();
 	m_context->getSwapChain()->createImageViews();
+	m_context->getSwapChain()->createDepthResources();
 	m_context->getSwapChain()->createFrameBuffers();
 }
 

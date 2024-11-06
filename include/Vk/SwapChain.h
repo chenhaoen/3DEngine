@@ -4,7 +4,8 @@
 
 #include <vulkan/vulkan.h>
 
-struct SwapChainSupportDetails {
+struct SwapChainSupportDetails
+{
     VkSurfaceCapabilitiesKHR capabilities;
     std::vector<VkSurfaceFormatKHR> formats;
     std::vector<VkPresentModeKHR> presentModes;
@@ -18,43 +19,44 @@ class RenderPass;
 class SwapChain
 {
 public:
-   SwapChain(
-        LogicalDevice* device,
-        PhysicalDevice* physicalDevice,
-        Surface* surface,
-        Window* window);
+    SwapChain(
+        LogicalDevice *device,
+        PhysicalDevice *physicalDevice,
+        Surface *surface,
+        Window *window);
 
-   ~SwapChain();
+    ~SwapChain();
 
-   void create();
-   void createImageViews();
-   void createFrameBuffers();
+    void create();
+    void createImageViews();
+    void createFrameBuffers();
 
-   void cleanup();
+    void createDepthResources();
 
-   void setRenderPass(RenderPass* renderPass);
+    void cleanup();
 
-   VkFormat getImageFormat() const;
-   VkExtent2D getExtent() const;
-   VkSwapchainKHR getVkSwapChain() const;
+    void setRenderPass(RenderPass *renderPass);
 
-   VkFramebuffer getFrameBuffer(const int index);
+    VkFormat getImageFormat() const;
+    VkExtent2D getExtent() const;
+    VkSwapchainKHR getVkSwapChain() const;
 
-   uint32_t getNextImageIndex(VkSemaphore semaphore);
-private:
+    VkFramebuffer getFrameBuffer(const int index);
 
-   SwapChainSupportDetails querySwapChainSupport();
-
-   VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
-   VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
-   VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+    uint32_t getNextImageIndex(VkSemaphore semaphore);
 
 private:
-    Window* m_window;
-    PhysicalDevice* m_physicalDevice;
-    Surface* m_surface;
-    LogicalDevice* m_device;
-    RenderPass* m_renderPass;
+    SwapChainSupportDetails querySwapChainSupport();
+
+    VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
+    VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes);
+    VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities);
+private:
+    Window *m_window;
+    PhysicalDevice *m_physicalDevice;
+    Surface *m_surface;
+    LogicalDevice *m_device;
+    RenderPass *m_renderPass;
 
     VkSwapchainKHR m_vkSwapChain;
 
@@ -64,5 +66,8 @@ private:
     VkExtent2D m_extent;
 
     std::vector<VkFramebuffer> m_frameBuffers;
-};
 
+    VkImage m_depthImage;
+    VkDeviceMemory m_depthImageMemory;
+    VkImageView m_depthImageView;
+};

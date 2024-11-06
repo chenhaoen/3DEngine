@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <array>
 
 #include "Base/Frame.h"
 #include "Base/Context.h"
@@ -74,8 +75,11 @@ void Frame::begin()
     renderPassInfo.renderPass = Context::instance()->getRenderPass()->getVkRenderPass();
     renderPassInfo.framebuffer = Context::instance()->getSwapChain()->getFrameBuffer(m_imageIndex);
 
-    renderPassInfo.clearValueCount = 1;
-    renderPassInfo.pClearValues = &m_clearValue;
+    std::array<VkClearValue, 2> clearValues{};
+    clearValues[0] = m_clearValue;
+    clearValues[1] = {1.0f, 0};
+    renderPassInfo.clearValueCount = clearValues.size();
+    renderPassInfo.pClearValues = clearValues.data();
 
     renderPassInfo.renderArea.extent = swapChainExtent;
 
