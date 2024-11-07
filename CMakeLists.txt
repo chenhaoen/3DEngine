@@ -15,3 +15,6 @@ set(RESOURCES_DIR ${CMAKE_CURRENT_LIST_DIR}/resources)
 
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/examples)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src)
+
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/3rd/glfw)
+

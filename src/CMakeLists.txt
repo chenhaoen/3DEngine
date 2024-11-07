@@ -7,8 +7,6 @@ set(NODES_SRC_DIR ${SRC_DIR}/Nodes)
 set(VK_INCLUDE_DIR ${INCLUDE_DIR}/Vk)
 set(VK_SRC_DIR ${SRC_DIR}/Vk)
 
-find_package(glfw3)
-
 file(GLOB BASE_SOURCES "${BASE_SRC_DIR}/*.cpp")
 file(GLOB BASE_HEADERS "${BASE_INCLUDE_DIR}/*.h")
 file(GLOB NODES_SOURCES "${NODES_SRC_DIR}/*.cpp")
