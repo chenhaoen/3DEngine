@@ -1,7 +1,5 @@
 project(Base)
 
-find_package(assimp)
-
 set(BASE_INCLUDE_DIR ${INCLUDE_DIR}/Base)
 set(BASE_SRC_DIR ${SRC_DIR}/Base)
 set(NODES_INCLUDE_DIR ${INCLUDE_DIR}/Nodes)
