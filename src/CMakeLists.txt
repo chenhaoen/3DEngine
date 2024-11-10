@@ -1,5 +1,7 @@
 project(Base)
 
+find_package(assimp)
+
 set(BASE_INCLUDE_DIR ${INCLUDE_DIR}/Base)
 set(BASE_SRC_DIR ${SRC_DIR}/Base)
 set(NODES_INCLUDE_DIR ${INCLUDE_DIR}/Nodes)
@@ -31,8 +33,12 @@ ${3DEngine_SOURCE_DIR}/3rd/imgui/backends/imgui_impl_glfw.cpp
 add_compile_definitions(BASE_EXPORT)
 add_compile_definitions(STB_IMAGE_IMPLEMENTATION)
 
+
 target_include_directories(${PROJECT_NAME} PRIVATE 
 ${3DEngine_SOURCE_DIR}/3rd/imgui
 ${3DEngine_SOURCE_DIR}/3rd/stb)
 
-target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan glfw)
+target_link_libraries(${PROJECT_NAME} 
+Vulkan::Vulkan
+glfw 
+assimp::assimp)

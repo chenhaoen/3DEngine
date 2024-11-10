@@ -30,13 +30,11 @@ const std::vector<Vertex> vertices = {
     {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
     {{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
     {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-    {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}
-};
+    {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}};
 
 const std::vector<uint16_t> indices = {
     0, 1, 2, 2, 3, 0,
-    4, 5, 6, 6, 7, 4
-};
+    4, 5, 6, 6, 7, 4};
 
 SceneLayer::SceneLayer(Window *window)
     : Layer(window), m_rootNode(nullptr)
@@ -94,7 +92,7 @@ SceneLayer::SceneLayer(Window *window)
         descriptorWrites[1].pImageInfo = &imageInfo;
 
         vkUpdateDescriptorSets(Context::instance()->getDevice()->getVkDevice(),
-         static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+                               static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
     }
 }
 
@@ -173,4 +171,8 @@ void SceneLayer::createUniformBuffers()
 
         vkMapMemory(Context::instance()->getDevice()->getVkDevice(), m_uniformBuffersMemory[i], 0, bufferSize, 0, &m_uniformBuffersMapped[i]);
     }
+}
+
+void SceneLayer::setModelFile(const std::string_view &)
+{
 }

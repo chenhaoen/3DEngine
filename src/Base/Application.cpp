@@ -100,3 +100,8 @@ Application *Application::instance()
 {
 	return g_instance;
 }
+
+void Application::setModelFile(const std::string_view& modelFile)
+{
+	m_layerManager->setModelFile(modelFile);
+}

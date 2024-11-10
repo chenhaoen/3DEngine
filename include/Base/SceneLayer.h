@@ -20,6 +20,8 @@ public:
 
     void createUniformBuffers();
 
+    void setModelFile(const std::string_view &);
+
 private:
     Node *m_rootNode;
 

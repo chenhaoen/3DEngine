@@ -15,6 +15,7 @@ public:
 
     void recordCommandBuffer(Frame *frame);
 
+    void setModelFile(const std::string_view&);
 private:
     std::list<Layer *> m_layers;
 

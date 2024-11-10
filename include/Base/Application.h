@@ -29,6 +29,7 @@ public:
 
 	static Application *instance();
 
+	void setModelFile(const std::string_view&);
 private:
 	Window *m_mainWindow;
 	FrameManager *m_frameManager;
