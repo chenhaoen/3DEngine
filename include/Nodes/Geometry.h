@@ -34,7 +34,9 @@ public:
 
 	void setIndices(const std::vector<uint16_t> indices);
 
-	void bind(VkCommandBuffer commandBuffer);
+	void compile();
+
+	void record(VkCommandBuffer commandBuffer);
 
 	void createTextureImage();
 

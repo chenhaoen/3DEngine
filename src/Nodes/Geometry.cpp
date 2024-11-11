@@ -5,12 +5,29 @@
 
 #include "Base/Context.h"
 #include "Base/Image.h"
+#include "Base/Application.h"
 
 #include "Vk/LogicalDevice.h"
 #include "Vk/PhysicalDevice.h"
 #include "Vk/CommandPool.h"
+#include "Vk/DescriptorImage.h"
 
 #include "stb_image.h"
+
+const std::vector<Vertex> vertices = {
+    {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+    {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+    {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+    {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
+
+    {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+    {{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+    {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+    {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}};
+
+const std::vector<uint16_t> indices = {
+    0, 1, 2, 2, 3, 0,
+    4, 5, 6, 6, 7, 4};
 
 VkVertexInputBindingDescription Vertex::getBindingDescription()
 {
@@ -57,6 +74,21 @@ Geometry::Geometry()
 	}
 
 	createTextureImage();
+
+	for (int i = 0; i < Application::maxFrameCount(); ++i)
+	{
+		VkDescriptorImageInfo imageInfo{};
+		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		imageInfo.imageView = m_textureImageView;
+		imageInfo.sampler = m_textureSampler;
+
+		DescriptorImage* descriptor = new DescriptorImage(imageInfo,1,0,VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+		Context::instance()->m_descriptors[i].push_back(descriptor);
+	}
+
+	setIndices(indices);
+	setVertices(vertices);
+	compile();
 }
 
 Geometry::~Geometry()
@@ -79,13 +111,11 @@ Geometry::~Geometry()
 void Geometry::setVertices(const std::vector<Vertex> &vertices)
 {
 	m_vertices = vertices;
-	createVertexBuffer();
 }
 
 void Geometry::setIndices(const std::vector<uint16_t> indices)
 {
 	m_indices = indices;
-	createIndexBuffer();
 }
 
 void Geometry::createVertexBuffer()
@@ -134,7 +164,13 @@ void Geometry::createIndexBuffer()
 	vkFreeMemory(Context::instance()->getDevice()->getVkDevice(), stagingBufferMemory, nullptr);
 }
 
-void Geometry::bind(VkCommandBuffer commandBuffer)
+void Geometry::compile()
+{
+	createVertexBuffer();
+	createIndexBuffer();
+}
+
+void Geometry::record(VkCommandBuffer commandBuffer)
 {
 
 	VkBuffer vertexBuffers[] = {m_vertexBuffer};
@@ -142,6 +178,8 @@ void Geometry::bind(VkCommandBuffer commandBuffer)
 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
 	vkCmdBindIndexBuffer(commandBuffer, m_indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
+	vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(m_indices.size()), 1, 0, 0, 0);
 }
 
 void Geometry::createTextureImage()
@@ -187,11 +225,9 @@ void Geometry::createTextureImage()
 	createTextureSampler();
 }
 
-
-
 void Geometry::createTextureImageView()
 {
-	m_textureImageView = createImageView(m_textureImage, VK_FORMAT_R8G8B8A8_SRGB,VK_IMAGE_ASPECT_COLOR_BIT);
+	m_textureImageView = createImageView(m_textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
 }
 
 void Geometry::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory)

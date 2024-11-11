@@ -17,5 +17,11 @@ Node *NodeReader::read(const std::string_view &file)
         return nullptr;
     }
 
+     for(unsigned int i = 0; i < scene->mRootNode->mNumMeshes; i++)
+    {
+        aiMesh *mesh = scene->mMeshes[scene->mRootNode->mMeshes[i]]; 
+              
+    }
+
     return nullptr;
 }

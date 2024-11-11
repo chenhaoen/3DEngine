@@ -13,6 +13,7 @@
 #include "Vk/RenderPass.h"
 #include "Vk/CommandPool.h"
 #include "Vk/DescriptorPool.h"
+#include "Vk/Descriptor.h"
 
 Context *Context::g_context = nullptr;
 
@@ -33,6 +34,15 @@ Context::~Context()
     delete m_surface;
     delete m_debugUtilsMessenger;
     delete m_instance;
+
+    for(auto descriptors : m_descriptors)
+    {
+        for(auto descriptor : descriptors)
+        {
+            delete descriptor;
+        }
+    }
+    m_descriptors.clear();
 }
 
 Instance *Context::getInsance()
@@ -114,6 +124,8 @@ void Context::init()
     m_commandPool = new CommandPool();
 
     m_descriptorPool = new DescriptorPool();
+
+    m_descriptors.resize(Application::maxFrameCount());
 }
 
 const std::vector<const char *> &Context::getInstanceExtensions() const

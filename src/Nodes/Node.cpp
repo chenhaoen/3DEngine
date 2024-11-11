@@ -8,3 +8,13 @@ Node::~Node()
 {
 
 }
+
+void Node::compile()
+{
+
+}
+
+void Node::record(VkCommandBuffer)
+{
+    
+}

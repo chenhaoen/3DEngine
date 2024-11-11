@@ -14,27 +14,16 @@
 #include "Nodes/Group.h"
 #include "Nodes/Geode.h"
 #include "Nodes/Geometry.h"
+#include "Nodes/NodeReader.h"
 
 #include "Vk/Pipeline.h"
 #include "Vk/DescriptorSetLayout.h"
 #include "Vk/SwapChain.h"
 #include "Vk/DescriptorPool.h"
 #include "Vk/LogicalDevice.h"
+#include "Vk/DescriptorUniformBuffer.h"
 
-const std::vector<Vertex> vertices = {
-    {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-    {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-    {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-    {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
-
-    {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-    {{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-    {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-    {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}};
-
-const std::vector<uint16_t> indices = {
-    0, 1, 2, 2, 3, 0,
-    4, 5, 6, 6, 7, 4};
+Geometry *geometry = nullptr;
 
 SceneLayer::SceneLayer(Window *window)
     : Layer(window), m_rootNode(nullptr)
@@ -57,49 +46,14 @@ SceneLayer::SceneLayer(Window *window)
         throw std::runtime_error("failed to allocate descriptor sets!");
     }
 
-    m_geometry = new Geometry();
-    m_geometry->setVertices(vertices);
-    m_geometry->setIndices(indices);
-
-    for (size_t i = 0; i < Application::maxFrameCount(); i++)
-    {
-        VkDescriptorBufferInfo bufferInfo{};
-        bufferInfo.buffer = m_uniformBuffers[i];
-        bufferInfo.offset = 0;
-        bufferInfo.range = sizeof(UniformBufferObject);
-
-        VkDescriptorImageInfo imageInfo{};
-        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        imageInfo.imageView = m_geometry->m_textureImageView;
-        imageInfo.sampler = m_geometry->m_textureSampler;
-
-        std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
-
-        descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        descriptorWrites[0].dstSet = m_descriptorSets[i];
-        descriptorWrites[0].dstBinding = 0;
-        descriptorWrites[0].dstArrayElement = 0;
-        descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        descriptorWrites[0].descriptorCount = 1;
-        descriptorWrites[0].pBufferInfo = &bufferInfo;
-
-        descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        descriptorWrites[1].dstSet = m_descriptorSets[i];
-        descriptorWrites[1].dstBinding = 1;
-        descriptorWrites[1].dstArrayElement = 0;
-        descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        descriptorWrites[1].descriptorCount = 1;
-        descriptorWrites[1].pImageInfo = &imageInfo;
-
-        vkUpdateDescriptorSets(Context::instance()->getDevice()->getVkDevice(),
-                               static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
-    }
+    geometry = new Geometry();
+    updateDescriptorSets();
 }
 
 SceneLayer::~SceneLayer()
 {
+    delete geometry;
     delete m_rootNode;
-    delete m_geometry;
 
     for (uint32_t i = 0; i < Application::maxFrameCount(); ++i)
     {
@@ -128,14 +82,12 @@ void SceneLayer::recordCommandBuffer(Frame *frame)
     scissor.extent = swapChainExtent;
     vkCmdSetScissor(frame->getCommandBuffer(), 0, 1, &scissor);
 
-    m_geometry->bind(frame->getCommandBuffer());
-
     updateUniformBuffer(frame);
 
     vkCmdBindDescriptorSets(frame->getCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline->getVkPipelineLayout(),
                             0, 1, &m_descriptorSets[frame->getIndex()], 0, nullptr);
 
-    vkCmdDrawIndexed(frame->getCommandBuffer(), static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+    geometry->record(frame->getCommandBuffer());
 }
 
 void SceneLayer::updateUniformBuffer(Frame *frame)
@@ -170,9 +122,37 @@ void SceneLayer::createUniformBuffers()
         Geometry::createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, m_uniformBuffers[i], m_uniformBuffersMemory[i]);
 
         vkMapMemory(Context::instance()->getDevice()->getVkDevice(), m_uniformBuffersMemory[i], 0, bufferSize, 0, &m_uniformBuffersMapped[i]);
+
+        VkDescriptorBufferInfo bufferInfo{};
+        bufferInfo.buffer = m_uniformBuffers[i];
+        bufferInfo.offset = 0;
+        bufferInfo.range = sizeof(UniformBufferObject);
+
+        Descriptor *descriptor = new DecriptorUniformBuffer(bufferInfo, 0, 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+        Context::instance()->m_descriptors[i].push_back(descriptor);
     }
 }
 
-void SceneLayer::setModelFile(const std::string_view &)
+void SceneLayer::setModelFile(const std::string_view &modelFile)
 {
+    m_rootNode = NodeReader::read(modelFile);
+    m_rootNode->compile();
+}
+
+void SceneLayer::updateDescriptorSets()
+{
+    for (size_t i = 0; i < Application::maxFrameCount(); i++)
+    {
+        const auto &descriptors = Context::instance()->m_descriptors[i];
+
+        std::vector<VkWriteDescriptorSet> descriptorWrites{};
+        for (Descriptor *descriptor : descriptors)
+        {
+            descriptor->bindSet(m_descriptorSets[i]);
+            descriptorWrites.push_back(descriptor->getWriteDescriptorSet());
+        }
+
+        vkUpdateDescriptorSets(Context::instance()->getDevice()->getVkDevice(),
+                               static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+    }
 }

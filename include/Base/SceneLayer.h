@@ -7,7 +7,6 @@
 #include "Base/Layer.h"
 
 class Node;
-class Geometry;
 class SceneLayer : public Layer
 {
 public:
@@ -23,9 +22,10 @@ public:
     void setModelFile(const std::string_view &);
 
 private:
-    Node *m_rootNode;
+    void updateDescriptorSets();
 
-    Geometry *m_geometry;
+private:
+    Node *m_rootNode;
 
     std::vector<VkDescriptorSet> m_descriptorSets;
 

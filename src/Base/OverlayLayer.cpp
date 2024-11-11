@@ -90,8 +90,12 @@ void OverlayLayer::recordCommandBuffer(Frame *frame)
 		static float f = 0.0f;
 		static int counter = 0;
 
+		ImGui::ShowMetricsWindow();
+
+
 		if (ImGui::BeginMainMenuBar())
 		{
+			ImGui::SetWindowFontScale(2.0);
 			if (ImGui::BeginMenu("File"))
 			{
 
@@ -133,12 +137,10 @@ void OverlayLayer::recordCommandBuffer(Frame *frame)
 
 		if (fileDialog.HasSelected())
 		{
-			std::string_view modelFile( fileDialog.GetSelected().generic_string());
+			std::string modelFile(fileDialog.GetSelected().string());
 			Application::instance()->setModelFile(modelFile);
 			fileDialog.ClearSelected();
 		}
-
-		ImGui::ShowMetricsWindow();
 	}
 
 	// Rendering
