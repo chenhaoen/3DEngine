@@ -14,21 +14,6 @@
 
 #include "stb_image.h"
 
-const std::vector<Vertex> vertices = {
-    {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-    {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-    {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-    {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
-
-    {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-    {{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-    {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-    {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}};
-
-const std::vector<uint16_t> indices = {
-    0, 1, 2, 2, 3, 0,
-    4, 5, 6, 6, 7, 4};
-
 VkVertexInputBindingDescription Vertex::getBindingDescription()
 {
 	VkVertexInputBindingDescription bindingDescription{};
@@ -72,23 +57,6 @@ Geometry::Geometry()
 	{
 		throw std::runtime_error("failed to create graphics command pool!");
 	}
-
-	createTextureImage();
-
-	for (int i = 0; i < Application::maxFrameCount(); ++i)
-	{
-		VkDescriptorImageInfo imageInfo{};
-		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		imageInfo.imageView = m_textureImageView;
-		imageInfo.sampler = m_textureSampler;
-
-		DescriptorImage* descriptor = new DescriptorImage(imageInfo,1,0,VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-		Context::instance()->m_descriptors[i].push_back(descriptor);
-	}
-
-	setIndices(indices);
-	setVertices(vertices);
-	compile();
 }
 
 Geometry::~Geometry()
@@ -116,6 +84,11 @@ void Geometry::setVertices(const std::vector<Vertex> &vertices)
 void Geometry::setIndices(const std::vector<uint16_t> indices)
 {
 	m_indices = indices;
+}
+
+void Geometry::setTextureFile(const std::string_view& file)
+{
+	m_textureFile = file;
 }
 
 void Geometry::createVertexBuffer()
@@ -168,11 +141,23 @@ void Geometry::compile()
 {
 	createVertexBuffer();
 	createIndexBuffer();
+
+	createTextureImage();
+
+	for (int i = 0; i < Application::maxFrameCount(); ++i)
+	{
+		VkDescriptorImageInfo imageInfo{};
+		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		imageInfo.imageView = m_textureImageView;
+		imageInfo.sampler = m_textureSampler;
+
+		DescriptorImage* descriptor = new DescriptorImage(imageInfo,1,0,VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+		Context::instance()->m_descriptors[i].push_back(descriptor);
+	}
 }
 
 void Geometry::record(VkCommandBuffer commandBuffer)
 {
-
 	VkBuffer vertexBuffers[] = {m_vertexBuffer};
 	VkDeviceSize offsets[] = {0};
 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
@@ -185,7 +170,7 @@ void Geometry::record(VkCommandBuffer commandBuffer)
 void Geometry::createTextureImage()
 {
 	int texWidth, texHeight, texChannels;
-	stbi_uc *pixels = stbi_load("textures/texture.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+	stbi_uc *pixels = stbi_load(m_textureFile.data(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 	VkDeviceSize imageSize = texWidth * texHeight * 4;
 
 	if (!pixels)

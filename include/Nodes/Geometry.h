@@ -33,6 +33,8 @@ public:
 	void setVertices(const std::vector<Vertex> &vertices);
 
 	void setIndices(const std::vector<uint16_t> indices);
+	
+	void setTextureFile(const std::string_view& file);
 
 	void compile();
 
@@ -83,4 +85,6 @@ private:
 	VkDeviceMemory m_indexBufferMemory;
 
 	VkCommandPool m_commandPool;
+
+	std::string_view m_textureFile = "models/viking_room.png";
 };

@@ -23,8 +23,6 @@
 #include "Vk/LogicalDevice.h"
 #include "Vk/DescriptorUniformBuffer.h"
 
-Geometry *geometry = nullptr;
-
 SceneLayer::SceneLayer(Window *window)
     : Layer(window), m_rootNode(nullptr)
 {
@@ -45,14 +43,10 @@ SceneLayer::SceneLayer(Window *window)
     {
         throw std::runtime_error("failed to allocate descriptor sets!");
     }
-
-    geometry = new Geometry();
-    updateDescriptorSets();
 }
 
 SceneLayer::~SceneLayer()
 {
-    delete geometry;
     delete m_rootNode;
 
     for (uint32_t i = 0; i < Application::maxFrameCount(); ++i)
@@ -64,6 +58,7 @@ SceneLayer::~SceneLayer()
 
 void SceneLayer::recordCommandBuffer(Frame *frame)
 {
+
     vkCmdBindPipeline(frame->getCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline->getVkPipeline());
 
     auto swapChainExtent = Context::instance()->getSwapChain()->getExtent();
@@ -87,7 +82,10 @@ void SceneLayer::recordCommandBuffer(Frame *frame)
     vkCmdBindDescriptorSets(frame->getCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline->getVkPipelineLayout(),
                             0, 1, &m_descriptorSets[frame->getIndex()], 0, nullptr);
 
-    geometry->record(frame->getCommandBuffer());
+    if (m_rootNode)
+    {
+        m_rootNode->record(frame->getCommandBuffer());
+    }
 }
 
 void SceneLayer::updateUniformBuffer(Frame *frame)
@@ -137,6 +135,7 @@ void SceneLayer::setModelFile(const std::string_view &modelFile)
 {
     m_rootNode = NodeReader::read(modelFile);
     m_rootNode->compile();
+    updateDescriptorSets();
 }
 
 void SceneLayer::updateDescriptorSets()
