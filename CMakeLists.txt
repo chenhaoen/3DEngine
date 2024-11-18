@@ -17,6 +17,7 @@ set(RESOURCES_DIR ${CMAKE_CURRENT_LIST_DIR}/resources)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/examples)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src)
 
+set(BUILD_SHARED_LIBS true)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/3rd/glfw)
 
 set(ASSIMP_WARNINGS_AS_ERRORS false)
