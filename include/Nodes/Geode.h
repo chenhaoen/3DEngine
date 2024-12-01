@@ -11,7 +11,11 @@ public:
     Geode();
     ~Geode();
 
-    void addGeometry(Geometry* geometry);
+    void addGeometry(Geometry *geometry);
+
+    void compile() override;
+
+    void record(VkCommandBuffer) override;
 
 private:
     std::vector<Geometry *> m_geometices;

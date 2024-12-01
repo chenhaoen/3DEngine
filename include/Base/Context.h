@@ -12,6 +12,7 @@ class RenderPass;
 class Window;
 class CommandPool;
 class DescriptorPool;
+class Descriptor;
 class Context
 {
 public:
@@ -36,6 +37,7 @@ public:
 	const std::vector<const char *> &getDeviceExtensions() const;
 	const std::vector<const char *> &getInstanceLayers() const;
 
+    std::vector<std::vector<Descriptor*>> m_descriptors;
 private:
     static Context* g_context;
 

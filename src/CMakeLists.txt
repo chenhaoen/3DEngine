@@ -7,8 +7,6 @@ set(NODES_SRC_DIR ${SRC_DIR}/Nodes)
 set(VK_INCLUDE_DIR ${INCLUDE_DIR}/Vk)
 set(VK_SRC_DIR ${SRC_DIR}/Vk)
 
-find_package(glfw3)
-
 file(GLOB BASE_SOURCES "${BASE_SRC_DIR}/*.cpp")
 file(GLOB BASE_HEADERS "${BASE_INCLUDE_DIR}/*.h")
 file(GLOB NODES_SOURCES "${NODES_SRC_DIR}/*.cpp")
@@ -33,8 +31,12 @@ ${3DEngine_SOURCE_DIR}/3rd/imgui/backends/imgui_impl_glfw.cpp
 add_compile_definitions(BASE_EXPORT)
 add_compile_definitions(STB_IMAGE_IMPLEMENTATION)
 
+
 target_include_directories(${PROJECT_NAME} PRIVATE 
 ${3DEngine_SOURCE_DIR}/3rd/imgui
 ${3DEngine_SOURCE_DIR}/3rd/stb)
 
-target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan glfw)
+target_link_libraries(${PROJECT_NAME} 
+Vulkan::Vulkan
+glfw 
+assimp::assimp)

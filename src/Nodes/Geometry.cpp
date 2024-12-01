@@ -4,10 +4,13 @@
 #include "Nodes/Geometry.h"
 
 #include "Base/Context.h"
+#include "Base/Image.h"
+#include "Base/Application.h"
 
 #include "Vk/LogicalDevice.h"
 #include "Vk/PhysicalDevice.h"
 #include "Vk/CommandPool.h"
+#include "Vk/DescriptorImage.h"
 
 #include "stb_image.h"
 
@@ -27,7 +30,7 @@ std::array<VkVertexInputAttributeDescription, 3> Vertex::getAttributeDescription
 
 	attributeDescriptions[0].binding = 0;
 	attributeDescriptions[0].location = 0;
-	attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+	attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
 	attributeDescriptions[0].offset = offsetof(Vertex, pos);
 
 	attributeDescriptions[1].binding = 0;
@@ -54,8 +57,6 @@ Geometry::Geometry()
 	{
 		throw std::runtime_error("failed to create graphics command pool!");
 	}
-
-	createTextureImage();
 }
 
 Geometry::~Geometry()
@@ -78,13 +79,16 @@ Geometry::~Geometry()
 void Geometry::setVertices(const std::vector<Vertex> &vertices)
 {
 	m_vertices = vertices;
-	createVertexBuffer();
 }
 
 void Geometry::setIndices(const std::vector<uint16_t> indices)
 {
 	m_indices = indices;
-	createIndexBuffer();
+}
+
+void Geometry::setTextureFile(const std::string_view& file)
+{
+	m_textureFile = file;
 }
 
 void Geometry::createVertexBuffer()
@@ -133,63 +137,40 @@ void Geometry::createIndexBuffer()
 	vkFreeMemory(Context::instance()->getDevice()->getVkDevice(), stagingBufferMemory, nullptr);
 }
 
-void Geometry::bind(VkCommandBuffer commandBuffer)
+void Geometry::compile()
 {
+	createVertexBuffer();
+	createIndexBuffer();
 
+	createTextureImage();
+
+	for (int i = 0; i < Application::maxFrameCount(); ++i)
+	{
+		VkDescriptorImageInfo imageInfo{};
+		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		imageInfo.imageView = m_textureImageView;
+		imageInfo.sampler = m_textureSampler;
+
+		DescriptorImage* descriptor = new DescriptorImage(imageInfo,1,0,VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+		Context::instance()->m_descriptors[i].push_back(descriptor);
+	}
+}
+
+void Geometry::record(VkCommandBuffer commandBuffer)
+{
 	VkBuffer vertexBuffers[] = {m_vertexBuffer};
 	VkDeviceSize offsets[] = {0};
 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
 	vkCmdBindIndexBuffer(commandBuffer, m_indexBuffer, 0, VK_INDEX_TYPE_UINT16);
-}
 
-void Geometry::createImage(uint32_t width, uint32_t height, VkFormat format,
-						   VkImageTiling tiling,
-						   VkImageUsageFlags usage,
-						   VkMemoryPropertyFlags properties,
-						   VkImage &image,
-						   VkDeviceMemory &imageMemory)
-{
-	VkImageCreateInfo imageInfo{};
-	imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-	imageInfo.imageType = VK_IMAGE_TYPE_2D;
-	imageInfo.extent.width = width;
-	imageInfo.extent.height = height;
-	imageInfo.extent.depth = 1;
-	imageInfo.mipLevels = 1;
-	imageInfo.arrayLayers = 1;
-	imageInfo.format = format;
-	imageInfo.tiling = tiling;
-	imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	imageInfo.usage = usage;
-	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-	if (vkCreateImage(Context::instance()->getDevice()->getVkDevice(), &imageInfo, nullptr, &image) != VK_SUCCESS)
-	{
-		throw std::runtime_error("failed to create image!");
-	}
-
-	VkMemoryRequirements memRequirements;
-	vkGetImageMemoryRequirements(Context::instance()->getDevice()->getVkDevice(), image, &memRequirements);
-
-	VkMemoryAllocateInfo allocInfo{};
-	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	allocInfo.allocationSize = memRequirements.size;
-	allocInfo.memoryTypeIndex = Context::instance()->getDevice()->getPhysicalDevice()->findMemoryType(memRequirements.memoryTypeBits, properties);
-
-	if (vkAllocateMemory(Context::instance()->getDevice()->getVkDevice(), &allocInfo, nullptr, &imageMemory) != VK_SUCCESS)
-	{
-		throw std::runtime_error("failed to allocate image memory!");
-	}
-
-	vkBindImageMemory(Context::instance()->getDevice()->getVkDevice(), image, imageMemory, 0);
+	vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(m_indices.size()), 1, 0, 0, 0);
 }
 
 void Geometry::createTextureImage()
 {
 	int texWidth, texHeight, texChannels;
-	stbi_uc *pixels = stbi_load("textures/texture.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+	stbi_uc *pixels = stbi_load(m_textureFile.data(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 	VkDeviceSize imageSize = texWidth * texHeight * 4;
 
 	if (!pixels)
@@ -229,31 +210,9 @@ void Geometry::createTextureImage()
 	createTextureSampler();
 }
 
-VkImageView createImageView(VkImage image, VkFormat format)
-{
-	VkImageViewCreateInfo viewInfo{};
-	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-	viewInfo.image = image;
-	viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-	viewInfo.format = format;
-	viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-	viewInfo.subresourceRange.baseMipLevel = 0;
-	viewInfo.subresourceRange.levelCount = 1;
-	viewInfo.subresourceRange.baseArrayLayer = 0;
-	viewInfo.subresourceRange.layerCount = 1;
-
-	VkImageView imageView;
-	if (vkCreateImageView(Context::instance()->getDevice()->getVkDevice(), &viewInfo, nullptr, &imageView) != VK_SUCCESS)
-	{
-		throw std::runtime_error("failed to create image view!");
-	}
-
-	return imageView;
-}
-
 void Geometry::createTextureImageView()
 {
-	m_textureImageView = createImageView(m_textureImage, VK_FORMAT_R8G8B8A8_SRGB);
+	m_textureImageView = createImageView(m_textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
 }
 
 void Geometry::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory)

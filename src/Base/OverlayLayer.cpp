@@ -2,10 +2,12 @@
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_vulkan.h"
 
+#include "Base/imfilebrowser.h"
 #include "Base/OverlayLayer.h"
 #include "Base/Frame.h"
 #include "Base/Window.h"
 #include "Base/Context.h"
+#include "Base/Application.h"
 
 #include "Vk/LogicalDevice.h"
 #include "Vk/PhysicalDevice.h"
@@ -71,24 +73,35 @@ bool show = true;
 bool show_another_window = false;
 ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+ImGui::FileBrowser fileDialog;
+
 void OverlayLayer::recordCommandBuffer(Frame *frame)
 {
 	// Start the Dear ImGui frame
 	ImGui_ImplVulkan_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
-	
+
+	// (optional) set browser properties
+	fileDialog.SetTitle("Model file");
+	fileDialog.SetTypeFilters({".obj"});
+
 	{
 		static float f = 0.0f;
 		static int counter = 0;
 
+		ImGui::ShowMetricsWindow();
+
+
 		if (ImGui::BeginMainMenuBar())
 		{
+			ImGui::SetWindowFontScale(2.0);
 			if (ImGui::BeginMenu("File"))
 			{
 
 				if (ImGui::MenuItem("Open"))
 				{
+					fileDialog.Open();
 				}
 
 				if (ImGui::MenuItem("Exit"))
@@ -120,7 +133,14 @@ void OverlayLayer::recordCommandBuffer(Frame *frame)
 			ImGui::EndMainMenuBar();
 		}
 
-		ImGui::ShowMetricsWindow();
+		fileDialog.Display();
+
+		if (fileDialog.HasSelected())
+		{
+			std::string modelFile(fileDialog.GetSelected().string());
+			Application::instance()->setModelFile(modelFile);
+			fileDialog.ClearSelected();
+		}
 	}
 
 	// Rendering

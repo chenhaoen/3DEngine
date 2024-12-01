@@ -7,7 +7,6 @@
 #include "Base/Layer.h"
 
 class Node;
-class Geometry;
 class SceneLayer : public Layer
 {
 public:
@@ -20,10 +19,13 @@ public:
 
     void createUniformBuffers();
 
+    void setModelFile(const std::string_view &);
+
+private:
+    void updateDescriptorSets();
+
 private:
     Node *m_rootNode;
-
-    Geometry *m_geometry;
 
     std::vector<VkDescriptorSet> m_descriptorSets;
 

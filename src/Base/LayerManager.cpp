@@ -28,3 +28,8 @@ void LayerManager::recordCommandBuffer(Frame *frame)
         layer->recordCommandBuffer(frame);
     }
 }
+
+void LayerManager::setModelFile(const std::string_view & modelFile)
+{
+    m_sceneLayer->setModelFile(modelFile);
+}

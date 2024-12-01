@@ -92,10 +92,16 @@ void Application::onEvent(Event &event)
 	m_context->getSwapChain()->cleanup();
 	m_context->getSwapChain()->create();
 	m_context->getSwapChain()->createImageViews();
+	m_context->getSwapChain()->createDepthResources();
 	m_context->getSwapChain()->createFrameBuffers();
 }
 
 Application *Application::instance()
 {
 	return g_instance;
+}
+
+void Application::setModelFile(const std::string_view& modelFile)
+{
+	m_layerManager->setModelFile(modelFile);
 }

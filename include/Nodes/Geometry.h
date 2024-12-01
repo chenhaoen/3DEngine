@@ -9,7 +9,7 @@
 
 struct Vertex
 {
-	glm::vec2 pos;
+	glm::vec3 pos;
 	glm::vec3 color;
 	glm::vec2 texCoord;
 
@@ -33,17 +33,12 @@ public:
 	void setVertices(const std::vector<Vertex> &vertices);
 
 	void setIndices(const std::vector<uint16_t> indices);
+	
+	void setTextureFile(const std::string_view& file);
 
-	void bind(VkCommandBuffer commandBuffer);
+	void compile();
 
-	void createImage(uint32_t width,
-					 uint32_t height,
-					 VkFormat format,
-					 VkImageTiling tiling,
-					 VkImageUsageFlags usage,
-					 VkMemoryPropertyFlags properties,
-					 VkImage &image,
-					 VkDeviceMemory &imageMemory);
+	void record(VkCommandBuffer commandBuffer);
 
 	void createTextureImage();
 
@@ -90,4 +85,6 @@ private:
 	VkDeviceMemory m_indexBufferMemory;
 
 	VkCommandPool m_commandPool;
+
+	std::string_view m_textureFile = "models/viking_room.png";
 };
